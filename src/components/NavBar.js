@@ -22,45 +22,46 @@ class NavBar extends React.Component {
   //   // }
   // }
 
-  getNotifications = async () => {
-    var notifications = [];
-    await getEventsByUserId(isAuthenticated().user._id, isAuthenticated().token)
-      .then(event => {
-        event.map(e => {
-          notifications.push({
-            id: e._id,
-            name: e.title,
-            type: "Event",
-            link: "/calendar/" + isAuthenticated().user._id,
-            isRead: false
-          });
-          return true;
-        });
-      })
-      .then(
-        await getAllTradeRequestsById(isAuthenticated().user._id).then(
-          trade => {
-            trade.map(t => {
-              notifications.push({
-                id: t._id,
-                name: t.tradeReceiver.name,
-                type: t.status.concat(" Trade"),
-                link: "/trades",
-                isRead: false
-              });
-              return true;
-            });
-          }
-        )
-      );
-    return notifications;
-  };
+  // getNotifications = async () => {
+  //   var notifications = [];
+  //   await getEventsByUserId(isAuthenticated().user._id, isAuthenticated().token)
+  //     .then(event => {
+  //       event.map(e => {
+  //         notifications.push({
+  //           id: e._id,
+  //           name: e.title,
+  //           type: "Event",
+  //           link: "/calendar/" + isAuthenticated().user._id,
+  //           isRead: false
+  //         });
+  //         return true;
+  //       });
+  //     })
+  //     .then(
+  //       await getAllTradeRequestsById(isAuthenticated().user._id).then(
+  //         trade => {
+  //           trade.map(t => {
+  //             notifications.push({
+  //               id: t._id,
+  //               name: t.tradeReceiver.name,
+  //               type: t.status.concat(" Trade"),
+  //               link: "/trades",
+  //               isRead: false
+  //             });
+  //             return true;
+  //           });
+  //         }
+  //       )
+  //     );
+  //   return notifications;
+  // };
 
   render() {
     return (
       <nav className="navbar navbar-icon-top navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div className="container-fluid">
           <NavLink
+            data-testid="postsLink"
             className="navbar-brand"
             to={isAuthenticated() ? "/posts" : "/"}
           >
