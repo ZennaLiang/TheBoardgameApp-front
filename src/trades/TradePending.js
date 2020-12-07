@@ -35,7 +35,7 @@ class TradePending extends React.Component {
   render() {
     return (
       <div className="card">
-        <div className="card-header">Pending Trade</div>
+        <div className="card-header font-weight-bold">Pending Trade</div>
         <div className="card-body">
           {this.props.trades.map(trade => {
             return (

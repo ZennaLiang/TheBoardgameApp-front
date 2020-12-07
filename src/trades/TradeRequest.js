@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
   faTimes,
-  faClosedCaptioning
+  faClosedCaptioning,
+  faEllipsisH
 } from "@fortawesome/free-solid-svg-icons";
 import { getTradeRequestById } from "./apiTrade";
 import { UncontrolledCollapse, Button, CardBody, Card } from "reactstrap";
@@ -51,14 +52,25 @@ class TradeRequest extends React.Component {
   render() {
     return (
       <div className="card">
-        {/*            
-         <ViewTradeRequestModal
-                  tradeData={this.state.trade}
-                  onClose={this.showModal}
-                  show={this.state.show}
-            
-                ></ViewTradeRequestModal> */}
-        <div className="card-header">{this.props.header}</div>
+        <div className="card-header font-weight-bold">
+          {this.props.header}
+
+          <Button
+            className="additionalActions bg-white "
+            data-toggle="dropdown"
+          >
+            <FontAwesomeIcon icon={faEllipsisH} />
+          </Button>
+
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/">
+              See More
+            </a>
+            <a class="dropdown-item" href="/">
+              Clear All Trades
+            </a>
+          </div>
+        </div>
 
         <div className="card-body">
           {this.props.trades.map(trade => {
@@ -71,28 +83,63 @@ class TradeRequest extends React.Component {
                   className="col-12"
                   style={{ marginBottom: "1rem" }}
                 >
-                  <img
-                    className="float-left rounded-circle"
-                    src="https://picsum.photos/75"
-                    alt="displaypic"
-                  />
-
-                  <div className="float-left pt-3 pl-3">
-                    <p>
-                      <a
-                        className="font-weight-bold h5 text-white"
-                        href={"user/" + trade.tradeReceiver._id}
-                      >
-                        {this.props.header === "Waiting for Response"
-                          ? Helpers.capitalize(trade.tradeReceiver.name)
-                          : Helpers.capitalize(trade.tradeSender.name)}{" "}
-                      </a>
-                      <br />
-                      <small className="float-left">
-                        {trade.tradeWants.length} games
-                      </small>
-                    </p>
-                  </div>
+                  {this.props.header === "Waiting for Response" ? (
+                    <div className="float-left pl-3">
+                      {trade.tradeReceiver.photo ? (
+                        <img
+                          className=" float-left rounded-circle avatarSize"
+                          src={`${process.env.REACT_APP_API_URL}/user/photo/${trade.tradeReceiver._id}`}
+                          alt="avatar"
+                        />
+                      ) : (
+                        <img
+                          className=" float-left rounded-circle avatarSize"
+                          src="https://picsum.photos/75"
+                          alt="avatar"
+                        />
+                      )}
+                      <p className="float-left pl-3 pt-3">
+                        <a
+                          className="font-weight-bold h5 text-white"
+                          href={"user/" + trade.tradeReceiver._id}
+                        >
+                          {Helpers.capitalize(trade.tradeReceiver.name)}
+                        </a>
+                        <br />
+                        <small className="float-left">
+                          {trade.tradeWants.length} games
+                        </small>
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="float-left pl-3">
+                      {trade.tradeSender.photo ? (
+                        <img
+                          className=" float-left rounded-circle avatarSize"
+                          src={`${process.env.REACT_APP_API_URL}/user/photo/${trade.tradeSender._id}`}
+                          alt="avatar"
+                        />
+                      ) : (
+                        <img
+                          className=" float-left rounded-circle avatarSize"
+                          src="https://picsum.photos/75"
+                          alt="avatar"
+                        />
+                      )}
+                      <p className="float-left pl-3 pt-3">
+                        <a
+                          className="font-weight-bold h5 text-white"
+                          href={"user/" + trade.tradeSender._id}
+                        >
+                          {Helpers.capitalize(trade.tradeSender.name)}
+                        </a>
+                        <br />
+                        <small className="float-left">
+                          {trade.tradeWants.length} games
+                        </small>
+                      </p>
+                    </div>
+                  )}
                   <div className="float-right text-white">
                     {new Date(trade.createdDate).toISOString().slice(0, 10)}
                   </div>
@@ -168,12 +215,6 @@ class TradeRequest extends React.Component {
               </div>
             );
           })}
-
-          <div className="card-footer text-center">
-            <a href="/" className="btn btn-primary">
-              Show More
-            </a>
-          </div>
         </div>
       </div>
     );

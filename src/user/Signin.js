@@ -20,7 +20,7 @@ const Signin = props => {
   const [alertStatus, setAlertStatus] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
   const [alertVisible, setAlertVible] = useState(false);
-  const { history } = props;
+  //const { history } = props;
 
   return (
     <>
@@ -53,7 +53,7 @@ const Signin = props => {
                         resetForm({});
                       } else {
                         authenticate(data, () => {
-                          window.location = "/posts"
+                          window.location = "/posts";
                         });
                       }
                     })

@@ -8,30 +8,30 @@ class Home extends React.Component {
     let tl = gsap.timeline();
     tl.set(".animator", {
       opacity: 0,
-      y: 50,
+      y: 50
     });
     tl.to(".animator", {
       duration: 0.6,
       opacity: 1,
       y: 0,
-      stagger: 0.07,
+      stagger: 0.07
     });
 
     tl.to(
       "#logo",
       {
         strokeDashoffset: 0,
-        duration: 2,
+        duration: 2
       },
       "-=0.6"
     );
 
     tl.to("#logo", {
       fill: "#3D82AC",
-      duration: 0.5,
+      duration: 0.5
     });
 
-    tl = gsap.timeline()
+    tl = gsap.timeline();
 
     inView.threshold(0.4);
 
@@ -40,15 +40,14 @@ class Home extends React.Component {
         tl.to(el, {
           opacity: 1,
           duration: 0.6,
-          stagger: 0.2,
-        })
+          stagger: 0.2
+        });
       })
       .on("exit", el => {
         tl.set(el, {
-          opacity: 0,
-        })
-      })
-
+          opacity: 0
+        });
+      });
   }
   render() {
     return (
@@ -78,13 +77,14 @@ class Home extends React.Component {
             </svg>
           </div>
           <div className="col-12 col-lg-4 px-5 py-2 d-flex justify-content-center align-items-start align-items-lg-center">
-            <img className="w-100" src="/board.svg" alt="gameboard image" />
+            <img className="w-100" src="/board.svg" alt="gameboard" />
             <NavLink to="/signup" className="btn btn-primary ctaButton">
               Get Started <i className="fa fa-arrow-right"></i>
             </NavLink>
           </div>
           <div className="scrollIndicator">
-            Scroll to learn more<br />
+            Scroll to learn more
+            <br />
             <i className="fa fa-chevron-down"></i>
           </div>
         </div>
@@ -92,11 +92,10 @@ class Home extends React.Component {
           <div className="col-12 fullHeight d-flex align-items-center">
             <div className="row w-100 m-0 align-items-center justify-content-center">
               <div className="col-lg-4 d-flex flex-column text-center align-items-center justify-content-center inView pb-5 pb-lg-0">
-                <h1 className="font-weight-bold">
-                  Trade
-                </h1>
-                <p >
-                  Trade your boardgames with others to keep your collection fresh.
+                <h1 className="font-weight-bold">Trade</h1>
+                <p>
+                  Trade your boardgames with others to keep your collection
+                  fresh.
                 </p>
               </div>
               <div className="col-lg-4 mt-3 mt-lg-0 text-center animator">
@@ -109,10 +108,8 @@ class Home extends React.Component {
           <div className="col-12 fullHeight d-flex align-items-center">
             <div className="row w-100 m-0 align-items-center justify-content-center">
               <div className="col-lg-4 d-flex flex-column text-center align-items-center justify-content-center inView pb-5 pb-lg-0">
-                <h1 className=" font-weight-bold">
-                  Collect
-                </h1>
-                <p >
+                <h1 className=" font-weight-bold">Collect</h1>
+                <p>
                   Grow and manage your boardgame collection all in one place.
                 </p>
               </div>
@@ -126,11 +123,10 @@ class Home extends React.Component {
           <div className="col-12 fullHeight d-flex align-items-center">
             <div className="row w-100 m-0 align-items-center justify-content-center">
               <div className="col-lg-4 d-flex flex-column text-center align-items-center justify-content-center inView pb-5 pb-lg-0">
-                <h1 className="font-weight-bold">
-                  Connect
-                </h1>
-                <p >
-                  Join the community and stay connected by following new people, creating events and chatting with others.
+                <h1 className="font-weight-bold">Connect</h1>
+                <p>
+                  Join the community and stay connected by following new people,
+                  creating events and chatting with others.
                 </p>
               </div>
               <div className="col-lg-4 text-center animator">
