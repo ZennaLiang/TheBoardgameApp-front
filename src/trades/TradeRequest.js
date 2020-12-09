@@ -64,10 +64,7 @@ class TradeRequest extends React.Component {
 
           <div class="dropdown-menu">
             <a class="dropdown-item" href="/">
-              See More
-            </a>
-            <a class="dropdown-item" href="/">
-              Clear All Trades
+              Work In Progress
             </a>
           </div>
         </div>
