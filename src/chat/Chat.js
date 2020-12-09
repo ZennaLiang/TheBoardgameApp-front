@@ -141,7 +141,7 @@ class Chat extends React.Component {
         loading: "chats",
         newMessage: false
       });
-      let chats = await this.getChats();
+      await this.getChats();
       this.scrollChat();
     } catch (error) {
       this.setState({
@@ -209,7 +209,7 @@ class Chat extends React.Component {
           loading: null
         });
         if (resp.length < 1) {
-          throw 404;
+          throw new Error(404);
         }
       } catch (error) {
         if (error === 429) {
@@ -268,7 +268,7 @@ class Chat extends React.Component {
         chats: []
       });
 
-      let chats = await this.getChats();
+      await this.getChats();
       this.setState({
         selectedChat: {}
       });
@@ -422,6 +422,7 @@ class Chat extends React.Component {
                             <div className="d-flex align-items-center justify-content-between">
                               <img
                                 className="chatProfImg shadow-sm mx-3"
+                                alt="Chat Profile"
                                 src={`${
                                   process.env.REACT_APP_API_URL
                                 }/user/photo/${
