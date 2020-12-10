@@ -62,8 +62,8 @@ class TradeRequest extends React.Component {
             <FontAwesomeIcon icon={faEllipsisH} />
           </Button>
 
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="/">
+          <div className="dropdown-menu">
+            <a className="dropdown-item" href="/">
               Work In Progress
             </a>
           </div>

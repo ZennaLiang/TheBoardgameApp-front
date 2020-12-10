@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink, withRouter } from "react-router-dom";
 import gsap from "gsap";
 import inView from "in-view";
+import Footer from "./Footer";
 
 class Home extends React.Component {
   componentDidMount() {
@@ -93,10 +94,7 @@ class Home extends React.Component {
             <div className="row w-100 m-0 align-items-center justify-content-center">
               <div className="col-lg-4 d-flex flex-column text-center align-items-center justify-content-center inView pb-5 pb-lg-0">
                 <h1 className="font-weight-bold">Trade</h1>
-                <p>
-                  Trade your boardgames with others to keep your collection
-                  fresh.
-                </p>
+                <p>Strike a deal with others to keep your collection fresh.</p>
               </div>
               <div className="col-lg-4 mt-3 mt-lg-0 text-center animator">
                 <i className="fa fa-10x fa-sync-alt graphic spinTrade inView"></i>
@@ -110,7 +108,8 @@ class Home extends React.Component {
               <div className="col-lg-4 d-flex flex-column text-center align-items-center justify-content-center inView pb-5 pb-lg-0">
                 <h1 className=" font-weight-bold">Collect</h1>
                 <p>
-                  Grow and manage your boardgame collection all in one place.
+                  Browse all user collections in one place. You never know what
+                  type of treasures you'll be able to get!
                 </p>
               </div>
               <div className="col-lg-4 text-center animator">
@@ -135,6 +134,7 @@ class Home extends React.Component {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
