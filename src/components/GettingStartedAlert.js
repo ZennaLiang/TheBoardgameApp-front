@@ -21,7 +21,6 @@ export default function GettingstartedAlert() {
   if (isAuthenticated()) {
     getUser(isAuthenticated().user._id, isAuthenticated().token).then(
       person => {
-        console.log(person.bggUsername);
         if (person.bggUsername) {
           setSync(true);
         } else {
