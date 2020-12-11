@@ -6,7 +6,7 @@ import BgLogo from "../images/BgLogo.png";
 import { getEventsByUserId } from "../calendar/apiCalendar";
 import { getAllTradeRequestsById } from "../trades/apiTrade";
 import Helpers from "../helpers";
-
+import GettingStartedAlert from "./GettingStartedAlert";
 class NavBar extends React.Component {
   // constructor() {
   //   super();
@@ -58,48 +58,48 @@ class NavBar extends React.Component {
 
   render() {
     return (
-      <nav className="navbar navbar-icon-top navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div className="container-fluid">
-          <NavLink
-            data-testid="postsLink"
-            className="navbar-brand"
-            to={isAuthenticated() ? "/posts" : "/"}
-          >
-            <img src={BgLogo} width="20" height="20" alt="" /> Boardgame Guru
-          </NavLink>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#bgNavBar"
-            aria-controls="bgNavBar"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="bgNavBar">
-            {isAuthenticated() && (
-              <ul className="navbar-nav mr-auto">
-                <li className="nav-item ">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="selected"
-                    to={`/user/${isAuthenticated().user._id}`}
-                  >{`${Helpers.capitalize(
-                    isAuthenticated().user.name
-                  )}'s Profile`}</NavLink>
-                </li>
-                <li className="nav-item ">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="selected"
-                    to="/posts"
-                  >
-                    Posts
-                  </NavLink>
-                </li>
-                {/* <li className="nav-item ">
+      <div>
+        <nav className="navbar navbar-icon-top navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+          <div className="container-fluid">
+            <NavLink
+              className="navbar-brand"
+              to={isAuthenticated() ? "/posts" : "/"}
+            >
+              <img src={BgLogo} width="20" height="20" alt="" /> Boardgame Guru
+            </NavLink>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-toggle="collapse"
+              data-target="#bgNavBar"
+              aria-controls="bgNavBar"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div className="collapse navbar-collapse" id="bgNavBar">
+              {isAuthenticated() && (
+                <ul className="navbar-nav mr-auto">
+                  <li className="nav-item ">
+                    <NavLink
+                      className="nav-link"
+                      activeClassName="selected"
+                      to={`/user/${isAuthenticated().user._id}`}
+                    >{`${Helpers.capitalize(
+                      isAuthenticated().user.name
+                    )}'s Profile`}</NavLink>
+                  </li>
+                  <li className="nav-item ">
+                    <NavLink
+                      className="nav-link"
+                      activeClassName="selected"
+                      to="/posts"
+                    >
+                      Posts
+                    </NavLink>
+                  </li>
+                  {/* <li className="nav-item ">
                   <NavLink
                     className="nav-link"
                     activeClassName="selected"
@@ -108,149 +108,151 @@ class NavBar extends React.Component {
                     Users
                   </NavLink>
                 </li> */}
-                <li className="nav-item dropdown ">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="/#"
-                    id="navbarDropdownCollectionLink"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    Collection
-                  </a>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="navbarDropdownCollectionLink"
-                  >
-                    <NavLink
-                      className="dropdown-item"
-                      activeClassName="selected"
-                      to="/collection/bgguru"
-                    >
-                      Guru Collection
-                    </NavLink>
-                    <NavLink
-                      className="dropdown-item"
-                      activeClassName="selected"
-                      to="/collection/bgg"
-                    >
-                      BGGeek Collection
-                    </NavLink>
-                  </div>
-                </li>
-                <li className="nav-item ">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="selected"
-                    to="/trades"
-                  >
-                    Trades
-                  </NavLink>
-                </li>
-                <li className="nav-item ">
-                  {isAuthenticated().user && (
-                    <NavLink
-                      className="nav-link"
-                      activeClassName="selected"
-                      to={`/calendar/${isAuthenticated().user._id}`}
-                    >
-                      Calendar
-                    </NavLink>
-                  )}
-                </li>
-              </ul>
-            )}
-            {/* {isAuthenticated().user && this.state.notifications && (
-              <Notification notificationsObj={this.state.notifications} />
-            )} */}
-            <ul className="navbar-nav ">
-              {!isAuthenticated() && (
-                <>
-                  <li className="nav-item">
-                    <NavLink
-                      className="nav-link"
-                      activeClassName="selected"
-                      to="/signin"
-                    >
-                      Sign In
-                    </NavLink>
-                  </li>
-                  <li className="nav-item ">
-                    <NavLink
-                      className="nav-link"
-                      activeClassName="selected"
-                      to="/signup"
-                    >
-                      Sign Up
-                    </NavLink>
-                  </li>
-                </>
-              )}
-              {isAuthenticated() && (
-                <>
-                  <li className="nav-item dropdown">
+                  <li className="nav-item dropdown ">
                     <a
-                      className="nav-link"
+                      className="nav-link dropdown-toggle"
                       href="/#"
-                      id="navbarDropdown"
+                      id="navbarDropdownCollectionLink"
                       role="button"
                       data-toggle="dropdown"
                       aria-haspopup="true"
                       aria-expanded="false"
                     >
-                      <div
-                        className=" profileInitalCircle text-center"
-                        style={{ fontSize: "32px" }}
-                      >
-                        <strong>{`${isAuthenticated()
-                          .user.name.substring(0, 1)
-                          .toUpperCase()}`}</strong>
-                      </div>
+                      Collection
                     </a>
                     <div
                       className="dropdown-menu"
-                      aria-labelledby="navbarDropdown"
+                      aria-labelledby="navbarDropdownCollectionLink"
                     >
-                      {isAuthenticated().user && (
-                        <NavLink
-                          className="dropdown-item"
-                          activeClassName="selected"
-                          to={`/user/edit/${isAuthenticated().user._id}`}
+                      <NavLink
+                        className="dropdown-item"
+                        activeClassName="selected"
+                        to="/collection/bgguru"
+                      >
+                        Guru Collection
+                      </NavLink>
+                      <NavLink
+                        className="dropdown-item"
+                        activeClassName="selected"
+                        to="/collection/bgg"
+                      >
+                        BGGeek Collection
+                      </NavLink>
+                    </div>
+                  </li>
+                  <li className="nav-item ">
+                    <NavLink
+                      className="nav-link"
+                      activeClassName="selected"
+                      to="/trades"
+                    >
+                      Trades
+                    </NavLink>
+                  </li>
+                  <li className="nav-item ">
+                    {isAuthenticated().user && (
+                      <NavLink
+                        className="nav-link"
+                        activeClassName="selected"
+                        to={`/calendar/${isAuthenticated().user._id}`}
+                      >
+                        Calendar
+                      </NavLink>
+                    )}
+                  </li>
+                </ul>
+              )}
+              {/* {isAuthenticated().user && this.state.notifications && (
+              <Notification notificationsObj={this.state.notifications} />
+            )} */}
+              <ul className="navbar-nav ">
+                {!isAuthenticated() && (
+                  <>
+                    <li className="nav-item">
+                      <NavLink
+                        className="nav-link"
+                        activeClassName="selected"
+                        to="/signin"
+                      >
+                        Sign In
+                      </NavLink>
+                    </li>
+                    <li className="nav-item ">
+                      <NavLink
+                        className="nav-link"
+                        activeClassName="selected"
+                        to="/signup"
+                      >
+                        Sign Up
+                      </NavLink>
+                    </li>
+                  </>
+                )}
+                {isAuthenticated() && (
+                  <>
+                    <li className="nav-item dropdown">
+                      <a
+                        className="nav-link"
+                        href="/#"
+                        id="navbarDropdown"
+                        role="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
+                        <div
+                          className=" profileInitalCircle text-center"
+                          style={{ fontSize: "32px" }}
                         >
-                          Settings
-                        </NavLink>
-                      )}
-                      {isAuthenticated() &&
-                        isAuthenticated().user.role === "admin" && (
+                          <strong>{`${isAuthenticated()
+                            .user.name.substring(0, 1)
+                            .toUpperCase()}`}</strong>
+                        </div>
+                      </a>
+                      <div
+                        className="dropdown-menu"
+                        aria-labelledby="navbarDropdown"
+                      >
+                        {isAuthenticated().user && (
                           <NavLink
                             className="dropdown-item"
                             activeClassName="selected"
-                            to="/admin"
+                            to={`/user/edit/${isAuthenticated().user._id}`}
                           >
-                            Admin
+                            Settings
                           </NavLink>
                         )}
-                      <div className="dropdown-divider"></div>
-                      <span
-                        className="dropdown-item"
-                        data-toggle="tooltip"
-                        title="Sign Out"
-                        aria-label="Sign Out"
-                        onClick={() => signout(() => (window.location = "/"))}
-                        style={{ cursor: "pointer" }}
-                      >
-                        Sign Out
-                      </span>
-                    </div>
-                  </li>
-                </>
-              )}
-            </ul>
+                        {isAuthenticated() &&
+                          isAuthenticated().user.role === "admin" && (
+                            <NavLink
+                              className="dropdown-item"
+                              activeClassName="selected"
+                              to="/admin"
+                            >
+                              Admin
+                            </NavLink>
+                          )}
+                        <div className="dropdown-divider"></div>
+                        <span
+                          className="dropdown-item"
+                          data-toggle="tooltip"
+                          title="Sign Out"
+                          aria-label="Sign Out"
+                          onClick={() => signout(() => (window.location = "/"))}
+                          style={{ cursor: "pointer" }}
+                        >
+                          Sign Out
+                        </span>
+                      </div>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+        {isAuthenticated ? <GettingStartedAlert /> : null}
+      </div>
     );
   }
 }
