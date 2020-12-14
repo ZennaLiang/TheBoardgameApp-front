@@ -22,39 +22,39 @@ class NavBar extends React.Component {
   //   // }
   // }
 
-  getNotifications = async () => {
-    var notifications = [];
-    await getEventsByUserId(isAuthenticated().user._id, isAuthenticated().token)
-      .then(event => {
-        event.map(e => {
-          notifications.push({
-            id: e._id,
-            name: e.title,
-            type: "Event",
-            link: "/calendar/" + isAuthenticated().user._id,
-            isRead: false
-          });
-          return true;
-        });
-      })
-      .then(
-        await getAllTradeRequestsById(isAuthenticated().user._id).then(
-          trade => {
-            trade.map(t => {
-              notifications.push({
-                id: t._id,
-                name: t.tradeReceiver.name,
-                type: t.status.concat(" Trade"),
-                link: "/trades",
-                isRead: false
-              });
-              return true;
-            });
-          }
-        )
-      );
-    return notifications;
-  };
+  // getNotifications = async () => {
+  //   var notifications = [];
+  //   await getEventsByUserId(isAuthenticated().user._id, isAuthenticated().token)
+  //     .then(event => {
+  //       event.map(e => {
+  //         notifications.push({
+  //           id: e._id,
+  //           name: e.title,
+  //           type: "Event",
+  //           link: "/calendar/" + isAuthenticated().user._id,
+  //           isRead: false
+  //         });
+  //         return true;
+  //       });
+  //     })
+  //     .then(
+  //       await getAllTradeRequestsById(isAuthenticated().user._id).then(
+  //         trade => {
+  //           trade.map(t => {
+  //             notifications.push({
+  //               id: t._id,
+  //               name: t.tradeReceiver.name,
+  //               type: t.status.concat(" Trade"),
+  //               link: "/trades",
+  //               isRead: false
+  //             });
+  //             return true;
+  //           });
+  //         }
+  //       )
+  //     );
+  //   return notifications;
+  // };
 
   render() {
     return (
@@ -64,8 +64,10 @@ class NavBar extends React.Component {
             <NavLink
               className="navbar-brand"
               to={isAuthenticated() ? "/posts" : "/"}
+              data-testid="company-logo"
             >
-              <img src={BgLogo} width="20" height="20" alt="" /> Boardgame Guru
+              <img src={BgLogo} width="20" height="20" alt="Company Logo" />{" "}
+              Boardgame Guru
             </NavLink>
             <button
               className="navbar-toggler"
