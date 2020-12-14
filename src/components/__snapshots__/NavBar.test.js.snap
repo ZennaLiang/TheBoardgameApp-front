@@ -1,0 +1,230 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Check if NavBar matches snapshot 1`] = `
+<BrowserRouter>
+  <Router
+    history={
+      Object {
+        "action": "POP",
+        "block": [Function],
+        "createHref": [Function],
+        "go": [Function],
+        "goBack": [Function],
+        "goForward": [Function],
+        "length": 1,
+        "listen": [Function],
+        "location": Object {
+          "hash": "",
+          "pathname": "/",
+          "search": "",
+          "state": undefined,
+        },
+        "push": [Function],
+        "replace": [Function],
+      }
+    }
+  >
+    <withRouter(NavBar)>
+      <NavBar
+        history={
+          Object {
+            "action": "POP",
+            "block": [Function],
+            "createHref": [Function],
+            "go": [Function],
+            "goBack": [Function],
+            "goForward": [Function],
+            "length": 1,
+            "listen": [Function],
+            "location": Object {
+              "hash": "",
+              "pathname": "/",
+              "search": "",
+              "state": undefined,
+            },
+            "push": [Function],
+            "replace": [Function],
+          }
+        }
+        location={
+          Object {
+            "hash": "",
+            "pathname": "/",
+            "search": "",
+            "state": undefined,
+          }
+        }
+        match={
+          Object {
+            "isExact": true,
+            "params": Object {},
+            "path": "/",
+            "url": "/",
+          }
+        }
+      >
+        <div>
+          <nav
+            className="navbar navbar-icon-top navbar-expand-lg navbar-light bg-light sticky-top shadow-sm"
+          >
+            <div
+              className="container-fluid"
+            >
+              <NavLink
+                className="navbar-brand"
+                data-testid="company-logo"
+                to="/"
+              >
+                <Link
+                  aria-current="page"
+                  className="navbar-brand active"
+                  data-testid="company-logo"
+                  style={Object {}}
+                  to={
+                    Object {
+                      "hash": "",
+                      "pathname": "/",
+                      "search": "",
+                      "state": null,
+                    }
+                  }
+                >
+                  <LinkAnchor
+                    aria-current="page"
+                    className="navbar-brand active"
+                    data-testid="company-logo"
+                    href="/"
+                    navigate={[Function]}
+                    style={Object {}}
+                  >
+                    <a
+                      aria-current="page"
+                      className="navbar-brand active"
+                      data-testid="company-logo"
+                      href="/"
+                      onClick={[Function]}
+                      style={Object {}}
+                    >
+                      <img
+                        alt="Company Logo"
+                        height="20"
+                        src={
+                          Object {
+                            "process": [Function],
+                          }
+                        }
+                        width="20"
+                      />
+                       
+                      Boardgame Guru
+                    </a>
+                  </LinkAnchor>
+                </Link>
+              </NavLink>
+              <button
+                aria-controls="bgNavBar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                className="navbar-toggler"
+                data-target="#bgNavBar"
+                data-toggle="collapse"
+                type="button"
+              >
+                <span
+                  className="navbar-toggler-icon"
+                />
+              </button>
+              <div
+                className="collapse navbar-collapse"
+                id="bgNavBar"
+              >
+                <ul
+                  className="navbar-nav "
+                >
+                  <li
+                    className="nav-item"
+                  >
+                    <NavLink
+                      activeClassName="selected"
+                      className="nav-link"
+                      to="/signin"
+                    >
+                      <Link
+                        aria-current={null}
+                        className="nav-link"
+                        to={
+                          Object {
+                            "hash": "",
+                            "pathname": "/signin",
+                            "search": "",
+                            "state": null,
+                          }
+                        }
+                      >
+                        <LinkAnchor
+                          aria-current={null}
+                          className="nav-link"
+                          href="/signin"
+                          navigate={[Function]}
+                        >
+                          <a
+                            aria-current={null}
+                            className="nav-link"
+                            href="/signin"
+                            onClick={[Function]}
+                          >
+                            Sign In
+                          </a>
+                        </LinkAnchor>
+                      </Link>
+                    </NavLink>
+                  </li>
+                  <li
+                    className="nav-item "
+                  >
+                    <NavLink
+                      activeClassName="selected"
+                      className="nav-link"
+                      to="/signup"
+                    >
+                      <Link
+                        aria-current={null}
+                        className="nav-link"
+                        to={
+                          Object {
+                            "hash": "",
+                            "pathname": "/signup",
+                            "search": "",
+                            "state": null,
+                          }
+                        }
+                      >
+                        <LinkAnchor
+                          aria-current={null}
+                          className="nav-link"
+                          href="/signup"
+                          navigate={[Function]}
+                        >
+                          <a
+                            aria-current={null}
+                            className="nav-link"
+                            href="/signup"
+                            onClick={[Function]}
+                          >
+                            Sign Up
+                          </a>
+                        </LinkAnchor>
+                      </Link>
+                    </NavLink>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+          <GettingstartedAlert />
+        </div>
+      </NavBar>
+    </withRouter(NavBar)>
+  </Router>
+</BrowserRouter>
+`;

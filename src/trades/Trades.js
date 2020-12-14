@@ -26,6 +26,7 @@ class Trades extends React.Component {
     let userId = isAuthenticated().user._id;
     getAllTradeRequestsById(userId).then(data => {
       if (data) {
+        console.log(data);
         let outgoingRequests = data.filter(
           trade =>
             userId === trade.tradeSender._id && trade.status !== "Pending"
