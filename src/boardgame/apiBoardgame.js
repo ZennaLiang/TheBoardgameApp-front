@@ -6,13 +6,13 @@ export const getBGCollection = (username, token) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+      Authorization: `Bearer ${token}`
+    }
   })
-    .then((response) => {
+    .then(response => {
       return response.json();
     })
-    .catch((err) => console.log(err));
+    .catch(err => console.log(err));
 };
 export const getGuruCollection = (userId, token) => {
   return fetch(
@@ -22,15 +22,15 @@ export const getGuruCollection = (userId, token) => {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+        Authorization: `Bearer ${token}`
+      }
     }
   )
-    .then((response) => {
+    .then(response => {
       return response.json();
     })
 
-    .catch((err) => console.log(err));
+    .catch(err => console.log(err));
 };
 export const getBGGCounts = (username, token) => {
   return fetch(`${process.env.REACT_APP_API_URL}/boardgame/count/${username}`, {
@@ -38,13 +38,13 @@ export const getBGGCounts = (username, token) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+      Authorization: `Bearer ${token}`
+    }
   })
-    .then((response) => {
+    .then(response => {
       return response.json();
     })
-    .catch((err) => console.log(err));
+    .catch(err => console.log(err));
 };
 
 export const updateUserBoardgames = (userId, boardgameUpdate) => {
@@ -56,50 +56,53 @@ export const updateUserBoardgames = (userId, boardgameUpdate) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(boardgameUpdate),
+      body: JSON.stringify(boardgameUpdate)
     }
   )
-    .then((response) => {
+    .then(response => {
       if (response.status === 200) {
         return response.json;
       }
     })
-    .then((data) => {
+    .then(data => {
       return data;
     })
-    .catch((err) => console.log(err));
+    .catch(err => console.log(err));
 };
 
-export const getAtlasBoardgameId = (name) => {
+export const getAtlasBoardgameId = name => {
+  console.log(
+    `${process.env.REACT_APP_BOARDGAME_ATLAS_API_URL}/search?name=${name}&fields=id,name,price,msrp&client_id=${process.env.REACT_APP_BOARDGAME_ATLAS_CLIENT_ID}`
+  );
   return fetch(
     `${process.env.REACT_APP_BOARDGAME_ATLAS_API_URL}/search?name=${name}&fields=id,name,price,msrp&client_id=${process.env.REACT_APP_BOARDGAME_ATLAS_CLIENT_ID}`,
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     }
   )
-    .then((response) => response.json())
-    .catch((err) => {
+    .then(response => response.json())
+    .catch(err => {
       console.log(err);
     });
 };
 
-export const getAtlasBoardgamePrice = (game_id) => {
+export const getAtlasBoardgamePrice = game_id => {
   return fetch(
     `${process.env.BOARDGAME_ATLAS_API_URL}/game/prices?game_id=${game_id}&client_id=${process.env.BOARDGAME_ATLAS_CLIENT_ID}`,
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     }
   )
-    .then((response) => response.json())
-    .catch((err) => {
+    .then(response => response.json())
+    .catch(err => {
       console.log(err);
     });
 };

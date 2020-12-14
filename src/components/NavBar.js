@@ -64,8 +64,10 @@ class NavBar extends React.Component {
             <NavLink
               className="navbar-brand"
               to={isAuthenticated() ? "/posts" : "/"}
+              data-testid="company-logo"
             >
-              <img src={BgLogo} width="20" height="20" alt="" /> Boardgame Guru
+              <img src={BgLogo} width="20" height="20" alt="Company Logo" />{" "}
+              Boardgame Guru
             </NavLink>
             <button
               className="navbar-toggler"

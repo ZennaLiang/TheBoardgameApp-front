@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SearchUser /> render SearchUser 1`] = `
+<div>
+  <input
+    className="w-25 mt-2 rounded"
+    id="searchbar"
+    name="search"
+    placeholder="Search..."
+    type="text"
+  />
+  <button
+    className="btn btn-primary"
+    disabled={false}
+    id="userInput"
+    type="button"
+  >
+    Search
+  </button>
+</div>
+`;

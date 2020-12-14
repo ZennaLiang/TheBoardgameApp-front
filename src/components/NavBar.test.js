@@ -1,14 +1,28 @@
-import { render, screen } from "@testing-library/react";
-import NavBar from "./NavBar";
-import renderer from "react-test-renderer";
 import React from "react";
-import { BrowserRouter } from "react-router-dom";
+import NavBar from "./NavBar";
+import { BrowserRouter, NavLink } from "react-router-dom";
+import { shallow, mount } from "enzyme";
+import { render, screen } from "@testing-library/dom";
+import "../../setupTests";
 
-test("renders correctly", () => {
-  const { queryByTestId, getByText } = render(
-    <BrowserRouter>
-      <NavBar />
-    </BrowserRouter>
-  );
-  expect(queryByTestId("postsLink")).toBeTruthy();
+const links = [
+  { text: "Sign In", location: "/signin" },
+  { text: "Sign Up", location: "/signup" }
+];
+const tree = (
+  <BrowserRouter>
+    <NavBar />
+  </BrowserRouter>
+);
+test.each(links)("Check if Nav Bar have %s link.", link => {
+  //Ensure the text is in the dom, will throw error it can't find
+
+  const linkDom = <NavLink to={link.location}>{link.text}</NavLink>;
+  const wrapper = shallow(tree);
+  expect(wrapper.find(linkDom)).toBeTruthy();
+});
+
+test("Check if NavBar matches snapshot", () => {
+  const wrapper = mount(tree);
+  expect(wrapper).toMatchSnapshot();
 });
