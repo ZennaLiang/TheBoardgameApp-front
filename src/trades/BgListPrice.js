@@ -3,6 +3,7 @@ import { isAuthenticated } from "../auth";
 import { getGuruCollection } from "../boardgame/apiBoardgame";
 import { getUserId } from "../user/apiUser";
 import { Input } from "reactstrap";
+import TradeCard from "./TradeCard";
 
 class BgListPrice extends React.Component {
   constructor(props) {
@@ -19,7 +20,7 @@ class BgListPrice extends React.Component {
       .then(id => {
         getGuruCollection(id, isAuthenticated().token).then(bgList => {
           this.state.bgData = bgList;
-
+          console.log(bgList);
           this.setState({ bgData: bgList, isLoading: false });
         });
       })
@@ -50,11 +51,6 @@ class BgListPrice extends React.Component {
     this.setState({ search: keyword });
   };
 
-  handleDoubleClick = event => {
-    this.props.addBoardgame(event);
-    console.log(event.target.value);
-  };
-
   render() {
     const items = this.props.bgData.filter(data => {
       if (this.state.search == null) return data;
@@ -69,38 +65,15 @@ class BgListPrice extends React.Component {
     });
 
     return (
-      /* <div class="card"  id={this.props.listID}>
-  <ul className="list-group list-group-flush pagination">
-  {this.props.bgData.map((bg,i)=>{
-                return <li className="list-group-item bgListItem font-weight-bold" id={bg._id} key={bg._id}><img className="bgListImg" src={bg.boardgame.imgThumbnail} alt="pic" />{bg.boardgame.title}</li>
-            })}
-
-  </ul>
-</div> */
-      <div>
+      <div id={this.props.listID}>
         <Input
           type="search"
           id="searchList"
           onChange={e => this.searchSpace(e)}
         ></Input>
-
-        <Input
-          type="select"
-          name="selectMulti"
-          multiple
-          size="15"
-          id={this.props.listID}
-          onDoubleClick={e => this.handleDoubleClick(e)}
-          required
-        >
-          {items.map((bg, i) => {
-            return (
-              <option id={bg._id} key={bg._id}>
-                {bg.boardgame.title} -- {bg.condition ? bg.condition : "N/A"}
-              </option>
-            );
-          })}
-        </Input>
+        {items.map((bg, i) => {
+          return <TradeCard id={bg._id} key={bg._id} bg={bg} />;
+        })}
 
         <div className="invalid-feedback">Please select a game to trade.</div>
       </div>
