@@ -1,7 +1,10 @@
 export const getUserId = username => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/find/${username}`, {
-    method: "GET"
-  })
+  return fetch(
+    `${process.env.REACT_APP_API_URL}/user/find/${username.toLowerCase()}`,
+    {
+      method: "GET"
+    }
+  )
     .then(response => response.json())
     .then(responseJson => {
       return responseJson.user._id;

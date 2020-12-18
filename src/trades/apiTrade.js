@@ -1,13 +1,13 @@
 function replacer(key, value) {
   if (key === "userTradeList" || key === "searchedUserTradeList") {
     let list = [];
-    console.log(value);
     for (var i = 0; i < value.length; i++) {
-      let obj = {};
-      obj.name = value[i].name;
-      obj.condition = value[i].condition;
-      obj.id = value[i].id;
-      obj.price = value[i].price;
+      let obj = {
+        name: value[i].bg.boardgame.title,
+        condition: value[i].bg.condition,
+        id: value[i].id,
+        tags: value[i].bg.tags
+      };
       list.push(obj);
     }
     return list;

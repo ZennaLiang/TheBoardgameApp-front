@@ -1,29 +1,14 @@
 import React from "react";
 import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
-import BgListPrice from "../boardgame/BgListPrice";
+import TradeDeck from "./TradeDeck";
 import Button from "react-bootstrap/Button";
 import ConfirmRequestModal from "./modals/ConfirmRequestModal";
 import { getUserId } from "../user/apiUser";
-import {
-  getGuruCollection,
-  getAtlasBoardgameId
-} from "../boardgame/apiBoardgame";
+import { getGuruCollection } from "../boardgame/apiBoardgame";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMinus,
-  faSearch,
-  faExchangeAlt
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  ListGroup,
-  ListGroupItem,
-  FormGroup,
-  Label,
-  Input,
-  InputGroupAddon,
-  Alert
-} from "reactstrap";
+import { faSearch, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
+import { FormGroup, Input, InputGroupAddon, Alert } from "reactstrap";
 import { Link } from "react-router-dom";
 
 class TradeRequestContainer extends React.Component {
@@ -71,9 +56,53 @@ class TradeRequestContainer extends React.Component {
       });
   }
 
+  listsExists = () => {
+    console.log(sessionStorage.getItem("myList"));
+    if (
+      JSON.parse(sessionStorage.getItem("myList")) === null ||
+      JSON.parse(sessionStorage.getItem("myList")) === [] ||
+      JSON.parse(sessionStorage.getItem("searchedUserList")) === null ||
+      JSON.parse(sessionStorage.getItem("searchedUserList")) === []
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   showModal = e => {
+    if (this.listsExists) {
+      console.log("tradeData ISNULL");
+      this.setState(prevState => ({
+        tradeData: {
+          ...prevState.tradeData,
+          userTradeList: [],
+          searchedUserTradeList: []
+        }
+      }));
+    } else {
+      this.setState(prevState => ({
+        show: !this.state.show,
+        tradeData: {
+          ...prevState.tradeData,
+          userTradeList: JSON.parse(sessionStorage.getItem("myList")),
+          searchedUserTradeList: JSON.parse(
+            sessionStorage.getItem("searchedUserList")
+          )
+        }
+      }));
+    }
+    this.setState(prevState => ({
+      show: !this.state.show,
+      tradeData: {
+        ...prevState.tradeData,
+        userTradeList: JSON.parse(sessionStorage.getItem("myList")),
+        searchedUserTradeList: JSON.parse(
+          sessionStorage.getItem("searchedUserList")
+        )
+      }
+    }));
     console.log(this.state.tradeData);
-    this.setState({ show: !this.state.show });
   };
 
   loadSearchedUserBoardgameData(user) {
@@ -90,19 +119,8 @@ class TradeRequestContainer extends React.Component {
           document.getElementById("searchbar").classList.add("is-invalid");
         } else {
           getGuruCollection(id, isAuthenticated().token).then(bgList => {
-            // Filter currently not working, it should filter out identical games from both lists
-            if (document.getElementById("filterMatching").checked === true) {
-              console.log("CHECKED");
-              console.log(bgList);
-              bgList = bgList.filter(
-                val => !this.state.userBoardgames.includes(val)
-              );
-              let userBoardgames = this.state.userBoardgames.filter(
-                val => !bgList.includes(val)
-              );
-              let filteredBgList = userBoardgames.filter(
-                bg => bg.forTrade === true
-              );
+            try {
+              let filteredBgList = bgList.filter(bg => bg.forTrade === true);
               this.setState(prevState => ({
                 tradeData: {
                   ...prevState.tradeData,
@@ -110,27 +128,11 @@ class TradeRequestContainer extends React.Component {
                   searchedUser: user
                 },
                 searchedUserBoardgames: filteredBgList,
-                userBoardgames: userBoardgames,
                 isLoading: false,
-                foundUser: TextTrackCue
+                foundUser: true
               }));
-            } else {
-              console.log("FILTER NOT CHECKED");
-              try {
-                let filteredBgList = bgList.filter(bg => bg.forTrade === true);
-                this.setState(prevState => ({
-                  tradeData: {
-                    ...prevState.tradeData,
-                    searchedUserID: id,
-                    searchedUser: user
-                  },
-                  searchedUserBoardgames: filteredBgList,
-                  isLoading: false,
-                  foundUser: true
-                }));
-              } catch (e) {
-                console.log(e);
-              }
+            } catch (e) {
+              console.log(e);
             }
           });
         }
@@ -139,180 +141,15 @@ class TradeRequestContainer extends React.Component {
         console.log(err);
       });
   }
-
-  handleAddBoardgame(event) {
-    if (event.currentTarget.id === "myList") {
-      try {
-        let available = document.getElementById("myList");
-        let name = available.options[available.selectedIndex].value.split(
-          " -- "
-        );
-        //using RegEx because trim is not working
-        let condition = name[1];
-        let MSRP = "";
-        getAtlasBoardgameId(name[0])
-          .then(boardgame => {
-            MSRP = boardgame.games[0].msrp;
-            var ID = available.options[available.selectedIndex].id;
-            const values = {
-              id: ID,
-              name: name[0],
-              price: MSRP,
-              condition: condition
-            };
-            const trades = this.state.tradeData.userTradeList;
-            const tradeItem = Object.create(values);
-            trades.push(tradeItem);
-            available.removeChild(available.options[available.selectedIndex]);
-
-            let total =
-              parseFloat(this.state.tradeData.userTotalPrice) +
-              parseFloat(MSRP);
-            this.setState(prevState => ({
-              tradeData: {
-                ...prevState.tradeData,
-                userTradeList: trades,
-                userTotalPrice: total.toFixed(2)
-              }
-            }));
-          })
-          .catch(err => {
-            document
-              .getElementById("searchedUserList")
-              .classList.add("is-invalid");
-            console.log(err);
-          });
-
-        /*Consider using this for state purposes...
-        SOLUTION: make Database calls using ID to refill array with item.
-         let bg = this.state.userBoardgames;
-         bg = bg.filter((element) => element._id !== ID);
-       this.setState({userBoardgames:bg, userTradeList: trades, userTotalPrice: total.toFixed(2) }); */
-
-        return true;
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      try {
-        let available = document.getElementById("searchedUserList");
-        let name = available.options[available.selectedIndex].value.split(
-          " -- "
-        );
-        //using RegEx because trim is not working
-        let condition = name[1];
-        let MSRP = "";
-        getAtlasBoardgameId(name[0]).then(boardgame => {
-          MSRP = boardgame.games[0].msrp;
-          var ID = available.options[available.selectedIndex].id;
-          const values = {
-            id: ID,
-            name: name[0],
-            price: MSRP,
-            condition: condition
-          };
-          const trades = this.state.tradeData.searchedUserTradeList;
-          const tradeItem = Object.create(values);
-          trades.push(tradeItem);
-          available.removeChild(available.options[available.selectedIndex]);
-
-          let total =
-            parseFloat(this.state.tradeData.searchedUserTotalPrice) +
-            parseFloat(MSRP);
-
-          this.setState(prevState => ({
-            tradeData: {
-              ...prevState.tradeData,
-              searchedUserTradeList: trades,
-              searchedUserTotalPrice: total.toFixed(2)
-            }
-          }));
-        });
-        return true;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
-  handleRemoveBoardgame(event) {
-    try {
-      const trades = this.state.tradeData.userTradeList;
-
-      const foundItem = trades.find(item => item.id === event.currentTarget.id);
-
-      const removeItem = trades.filter(
-        item => item.id !== event.currentTarget.id
-      );
-      var available = document.getElementById("myList");
-      var element = document.createElement("option");
-      element.setAttribute("id", foundItem.id);
-      element.appendChild(
-        document.createTextNode(foundItem.name + " -- " + foundItem.condition)
-      );
-      available.appendChild(element);
-
-      let parsedPrice = foundItem.price;
-      let total =
-        parseFloat(this.state.tradeData.userTotalPrice) -
-        parseFloat(parsedPrice);
-      this.setState(prevState => ({
-        tradeData: {
-          ...prevState.tradeData,
-          userTradeList: removeItem,
-          userTotalPrice: total.toFixed(2)
-        }
-      }));
-      return true;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  handleRemoveUserBoardgame(event) {
-    try {
-      const trades = this.state.tradeData.searchedUserTradeList;
-      const foundItem = trades.find(item => item.id === event.currentTarget.id);
-      const removeItem = trades.filter(
-        item => item.id !== event.currentTarget.id
-      );
-      console.log(foundItem);
-      var available = document.getElementById("searchedUserList");
-      var element = document.createElement("option");
-      element.setAttribute("id", foundItem.id);
-      element.appendChild(
-        document.createTextNode(foundItem.name + " -- " + foundItem.condition)
-      );
-      available.appendChild(element);
-
-      let parsedPrice = foundItem.price;
-      let total =
-        parseFloat(this.state.tradeData.searchedUserTotalPrice) -
-        parseFloat(parsedPrice);
-      this.setState(prevState => ({
-        tradeData: {
-          ...prevState.tradeData,
-          searchedUserTradeList: removeItem,
-          searchedUserTotalPrice: total.toFixed(2)
-        }
-      }));
-      return true;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   onChangeSearchBar = () => {
     document.getElementById("searchbar").classList.remove("is-invalid");
   };
 
-  onChangeCondition = () => {
-    document.getElementById("conditionSelect").classList.remove("is-invalid");
-  };
-  onChangeCondition2 = () => {
-    document.getElementById("conditionSelect2").classList.remove("is-invalid");
-  };
   handleSearchButton(event) {
     var inputValue = document.getElementById("searchbar").value;
     this.loadSearchedUserBoardgameData(inputValue);
+    sessionStorage.removeItem("myList");
+    sessionStorage.removeItem("searchedUserList");
   }
   handleEnterKey(e) {
     let val = e.target.value;
@@ -390,15 +227,6 @@ class TradeRequestContainer extends React.Component {
                     User entered is not valid.
                   </div>
                 </FormGroup>
-
-                <FormGroup className="pl-4 pt-1">
-                  <span>
-                    <Label check>
-                      <Input id="filterMatching" type="checkbox" />
-                      Filter Matching Games *WIP
-                    </Label>
-                  </span>
-                </FormGroup>
               </div>
             </div>
             {/* START Recipient trade list */}
@@ -426,78 +254,10 @@ class TradeRequestContainer extends React.Component {
                     <br />
                     <div className="col-12 form-group ">
                       <div className="form-group">
-                        <BgListPrice
+                        <TradeDeck
                           bgData={this.state.userBoardgames}
                           listID="myList"
-                          addBoardgame={this.handleAddBoardgame.bind(this)}
                         />
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="form-group">
-                        <label>To Trade:</label>
-                        <ListGroup id="tradedToYou">
-                          {this.state.tradeData.userTradeList.map(item => (
-                            <ListGroupItem
-                              className="float-left font-weight-bold"
-                              key={item.id}
-                            >
-                              <FontAwesomeIcon
-                                id={item.id}
-                                onClick={this.handleRemoveBoardgame.bind(this)}
-                                className="align-middle cursor-pointer"
-                                style={{ float: "left" }}
-                                color="red"
-                                size="lg"
-                                icon={faMinus}
-                              ></FontAwesomeIcon>
-                              &nbsp;
-                              {item.name.length < 40
-                                ? item.name
-                                : item.name.substring(0, 40) + "..."}{" "}
-                              <h4 className="float-right">
-                                MSRP:
-                                {item.price === "0.00"
-                                  ? "N/A"
-                                  : "$" + item.price}
-                              </h4>
-                              <br />
-                              {(function() {
-                                switch (item.condition) {
-                                  case "Excellent":
-                                    return (
-                                      <span className="badge badge-success float-left">
-                                        {item.condition}
-                                      </span>
-                                    );
-                                  case "Good":
-                                    return (
-                                      <span className="badge badge-primary float-left">
-                                        {item.condition}
-                                      </span>
-                                    );
-                                  case "Fair":
-                                    return (
-                                      <span className="badge badge-warning float-left">
-                                        {item.condition}
-                                      </span>
-                                    );
-                                  case "Poor":
-                                    return (
-                                      <span className="badge badge-danger float-left">
-                                        {item.condition}
-                                      </span>
-                                    );
-                                  default:
-                                    return null;
-                                }
-                              })()}
-                            </ListGroupItem>
-                          ))}
-                        </ListGroup>
-                        <h3 className="float-right">
-                          Value: ${this.state.tradeData.userTotalPrice}
-                        </h3>
                       </div>
                     </div>
                   </div>
@@ -516,84 +276,10 @@ class TradeRequestContainer extends React.Component {
 
                       <br />
                       <div className="col-12 form-group">
-                        <BgListPrice
+                        <TradeDeck
                           bgData={this.state.searchedUserBoardgames}
                           listID="searchedUserList"
-                          addBoardgame={this.handleAddBoardgame.bind(this)}
                         />
-                      </div>
-
-                      <div className="col-12">
-                        <div className="form-group">
-                          <label>To Trade:</label>
-                          <ListGroup id="tradedToMe">
-                            {this.state.tradeData.searchedUserTradeList.map(
-                              item => (
-                                <ListGroupItem
-                                  key={item.id}
-                                  className="align-middle font-weight-bold"
-                                >
-                                  <FontAwesomeIcon
-                                    id={item.id}
-                                    onClick={this.handleRemoveUserBoardgame.bind(
-                                      this
-                                    )}
-                                    className="align-middle cursor-pointer"
-                                    style={{ float: "left" }}
-                                    color="red"
-                                    size="lg"
-                                    icon={faMinus}
-                                  ></FontAwesomeIcon>
-                                  &nbsp;
-                                  {item.name.length < 40
-                                    ? item.name
-                                    : item.name.substring(0, 40) + "..."}
-                                  <h4 className="float-right">
-                                    MSRP:
-                                    {item.price === "0.00"
-                                      ? "N/A"
-                                      : "$" + item.price}
-                                  </h4>
-                                  <br />
-                                  {(function() {
-                                    switch (item.condition) {
-                                      case "Excellent":
-                                        return (
-                                          <span className="badge badge-success float-left">
-                                            {item.condition}
-                                          </span>
-                                        );
-                                      case "Good":
-                                        return (
-                                          <span className="badge badge-primary float-left">
-                                            {item.condition}
-                                          </span>
-                                        );
-                                      case "Fair":
-                                        return (
-                                          <span className="badge badge-warning float-left">
-                                            {item.condition}
-                                          </span>
-                                        );
-                                      case "Poor":
-                                        return (
-                                          <span className="badge badge-danger float-left">
-                                            {item.condition}
-                                          </span>
-                                        );
-                                      default:
-                                        return null;
-                                    }
-                                  })()}
-                                </ListGroupItem>
-                              )
-                            )}
-                          </ListGroup>
-                          <h3 className="float-right">
-                            Value: $
-                            {this.state.tradeData.searchedUserTotalPrice}
-                          </h3>
-                        </div>
                       </div>
                     </div>
                   ) : (
@@ -616,7 +302,8 @@ class TradeRequestContainer extends React.Component {
                 <div className="row bg-dark p-3">
                   <div className="offset-5">
                     <button
-                      className="btn btn-success"
+                      id="reviewTradeButton"
+                      className="btn btn-success disabled"
                       onClick={e => {
                         this.showModal();
                       }}
@@ -631,7 +318,9 @@ class TradeRequestContainer extends React.Component {
                   </div>
                 </div>
                 <ConfirmRequestModal
-                  tradeData={this.state.tradeData}
+                  tradeData={
+                    this.state.tradeData !== null ? this.state.tradeData : []
+                  }
                   onClose={this.showModal}
                   show={this.state.show}
                 ></ConfirmRequestModal>

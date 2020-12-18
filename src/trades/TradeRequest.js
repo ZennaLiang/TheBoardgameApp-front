@@ -149,7 +149,7 @@ class TradeRequest extends React.Component {
                           <h4>Wants:</h4>
                           {trade.tradeWants.map(game => (
                             <p key={game._id}>
-                              {game.name}{" "}
+                              {game.name}
                               <span
                                 className={`badge ${this.badgeBgRender(
                                   game.condition
@@ -159,6 +159,13 @@ class TradeRequest extends React.Component {
                                   ? null
                                   : game.condition}
                               </span>
+                              <br />
+                              {game.tags.map((tag, i) => (
+                                <span key={i} className="badge badge-info mr-1">
+                                  {tag}
+                                </span>
+                              ))}
+                              <hr />
                             </p>
                           ))}
                         </div>
@@ -176,6 +183,13 @@ class TradeRequest extends React.Component {
                                   ? null
                                   : game.condition}
                               </span>
+                              <br />
+                              {game.tags.map((tag, i) => (
+                                <span key={i} className="badge badge-info mr-1">
+                                  {tag}
+                                </span>
+                              ))}
+                              <hr />
                             </p>
                           ))}
                         </div>
