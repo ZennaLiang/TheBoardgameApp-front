@@ -1,7 +1,7 @@
 import React from "react";
 import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
-import BgListPrice from "./BgListPrice";
+import TradeDeck from "./TradeDeck";
 import Button from "react-bootstrap/Button";
 import ConfirmRequestModal from "./modals/ConfirmRequestModal";
 import { getUserId } from "../user/apiUser";
@@ -254,7 +254,7 @@ class TradeRequestContainer extends React.Component {
                     <br />
                     <div className="col-12 form-group ">
                       <div className="form-group">
-                        <BgListPrice
+                        <TradeDeck
                           bgData={this.state.userBoardgames}
                           listID="myList"
                         />
@@ -276,7 +276,7 @@ class TradeRequestContainer extends React.Component {
 
                       <br />
                       <div className="col-12 form-group">
-                        <BgListPrice
+                        <TradeDeck
                           bgData={this.state.searchedUserBoardgames}
                           listID="searchedUserList"
                         />
