@@ -59,7 +59,11 @@ class TradePending extends React.Component {
 
                 <div className="col-4 ">
                   <div className="float-right">
-                    <button type="button" className="btn btn-success mx-2 my-3">
+                    <button
+                      type="button"
+                      className="btn btn-success mx-2 my-3"
+                      onClick={() => this.props.onClickComplete(trade._id)}
+                    >
                       Complete
                     </button>
                   </div>

@@ -70,7 +70,6 @@ export const getAllTradeRequestsById = userId => {
     }
   })
     .then(response => {
-      console.log(response);
       if (response.status === 204) {
         return false;
       } else {

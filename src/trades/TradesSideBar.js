@@ -32,10 +32,7 @@ class TradesSideBar extends React.Component {
     this.init(userId);
   }
 
-
-
   render() {
-    
     return (
       <>
         <div
@@ -51,10 +48,11 @@ class TradesSideBar extends React.Component {
               className={`btn btn-success text-left my-1 font-weight-bold`}
               to={`/newTrade`}
             >
-              <span ><FontAwesomeIcon  icon={faPlusCircle}></FontAwesomeIcon> </span>
-                New Trade <span className="sr-only">(current)</span>
+              <span>
+                <FontAwesomeIcon icon={faPlusCircle}></FontAwesomeIcon>{" "}
+              </span>
+              New Trade <span className="sr-only">(current)</span>
             </Link>
-
 
             <Link
               className={`list-group-item list-group-item-action ${
@@ -66,11 +64,11 @@ class TradesSideBar extends React.Component {
             </Link>
             <Link
               className={`list-group-item list-group-item-action ${
-                this.props.highlight === "TradeMatch" ? "active" : ""
+                this.props.highlight === "TradeHistory" ? "active" : ""
               }`}
-              to={`/trades/matches`}
+              to={`/trades/history`}
             >
-              Match Trades
+              Trade History
             </Link>
             <Link
               className={`list-group-item list-group-item-action ${

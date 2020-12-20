@@ -29,11 +29,15 @@ class Trades extends React.Component {
         console.log(data);
         let outgoingRequests = data.filter(
           trade =>
-            userId === trade.tradeSender._id && trade.status !== "Pending"
+            userId === trade.tradeSender._id &&
+            trade.status !== "Pending" &&
+            trade.status !== "Closed"
         );
         let incomingRequests = data.filter(
           trade =>
-            userId === trade.tradeReceiver._id && trade.status !== "Pending"
+            userId === trade.tradeReceiver._id &&
+            trade.status !== "Pending" &&
+            trade.status !== "Closed"
         );
         let pendingRequests = data.filter(trade => trade.status === "Pending");
         this.setState({
@@ -63,7 +67,6 @@ class Trades extends React.Component {
     const token = isAuthenticated().token;
     try {
       deleteTrade(token, tradeId).then(data => {
-        console.log("inDelete");
         if (data.error) {
           console.log(data.error);
         }
@@ -72,6 +75,43 @@ class Trades extends React.Component {
         request => request._id !== tradeId
       );
       this.setState({ tradeRequests: newList });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  onClickRejectTrade = tradeId => {
+    const token = isAuthenticated().token;
+    try {
+      updateTradeStatus(token, tradeId, "Closed").then(data => {
+        if (data.error) {
+          console.log(data.error);
+        } else {
+          console.log(data);
+        }
+      });
+      let newList = this.state.tradeRequests.filter(
+        request => request._id !== tradeId
+      );
+      this.setState({ tradePending: newList });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  onClickCompleteTrade = tradeId => {
+    const token = isAuthenticated().token;
+    try {
+      updateTradeStatus(token, tradeId, "Complete").then(data => {
+        if (data.error) {
+          console.log(data.error);
+        } else {
+          console.log(data);
+        }
+      });
+      let newList = this.state.tradeRequests.filter(
+        request => request._id !== tradeId
+      );
+      this.setState({ tradePending: newList });
     } catch (err) {
       console.error(err);
     }
@@ -106,7 +146,7 @@ class Trades extends React.Component {
           {/* BgSidebar is col-sm-3 */}
           <TradesSideBar highlight="Trades" />
           <div className="col-sm-6 col-lg-6 animator">
-            <h4>My Trades</h4>
+            <h4>Active Trades</h4>
             {this.state.isLoading ? (
               "Loading..."
             ) : (
@@ -121,12 +161,16 @@ class Trades extends React.Component {
                 <TradeRequest
                   trades={this.state.tradeResponses}
                   onClickAccept={this.onClickAcceptTrade.bind(this)}
+                  onClickDelete={this.onClickRejectTrade.bind(this)}
                   header="Response Needed"
                   deleteText="Reject"
                   successButton="Accept"
                 />
                 <br />
-                <TradePending trades={this.state.tradePending} />
+                <TradePending
+                  trades={this.state.tradePending}
+                  onClickComplete={this.onClickCompleteTrade.bind(this)}
+                />
               </div>
             )}
           </div>
