@@ -23,7 +23,7 @@ import BggCollection from "./boardgame/BggCollection";
 import UserBgCollection from "./boardgame/UserBgCollection";
 
 import Trades from "./trades/Trades";
-import TradeMatch from "./trades/TradeMatch";
+import TradeHistory from "./trades/TradeHistory";
 import TradeSettings from "./trades/TradeSettings";
 import TradeListItems from "./trades/TradeRequestContainer";
 import RequestSent from "./components/RequestSent";
@@ -52,7 +52,7 @@ class MainRouter extends React.Component {
             component={UserBgCollection}
           />
           <PrivateRoute exact path="/trades" component={Trades} />
-          <PrivateRoute exact path="/trades/matches" component={TradeMatch} />
+          <PrivateRoute exact path="/trades/history" component={TradeHistory} />
           <PrivateRoute
             exact
             path="/trades/settings"
