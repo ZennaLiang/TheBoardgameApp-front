@@ -18,6 +18,7 @@
   },
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://tselouie.github.io/TheBoardgameGuru",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
@@ -64,6 +65,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "test": "jest",
     "eject": "react-scripts eject"
   },
@@ -88,6 +91,7 @@
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
     "enzyme-to-json": "^3.6.1",
+    "gh-pages": "^4.0.0",
     "jest": "^26.6.3",
     "react-test-renderer": "^17.0.1"
   }
