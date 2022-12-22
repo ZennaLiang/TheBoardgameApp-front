@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/BoardgameGuru/static/css/main.69429b8e.chunk.css",
+    "main.js": "/BoardgameGuru/static/js/main.7584da12.chunk.js",
+    "main.js.map": "/BoardgameGuru/static/js/main.7584da12.chunk.js.map",
+    "runtime-main.js": "/BoardgameGuru/static/js/runtime-main.8926dc09.js",
+    "runtime-main.js.map": "/BoardgameGuru/static/js/runtime-main.8926dc09.js.map",
+    "static/css/2.664f5629.chunk.css": "/BoardgameGuru/static/css/2.664f5629.chunk.css",
+    "static/js/2.4752edbe.chunk.js": "/BoardgameGuru/static/js/2.4752edbe.chunk.js",
+    "static/js/2.4752edbe.chunk.js.map": "/BoardgameGuru/static/js/2.4752edbe.chunk.js.map",
+    "index.html": "/BoardgameGuru/index.html",
+    "precache-manifest.87cb51ea9ed6e54657f9c2a1efaf77b6.js": "/BoardgameGuru/precache-manifest.87cb51ea9ed6e54657f9c2a1efaf77b6.js",
+    "service-worker.js": "/BoardgameGuru/service-worker.js",
+    "static/css/2.664f5629.chunk.css.map": "/BoardgameGuru/static/css/2.664f5629.chunk.css.map",
+    "static/css/main.69429b8e.chunk.css.map": "/BoardgameGuru/static/css/main.69429b8e.chunk.css.map",
+    "static/js/2.4752edbe.chunk.js.LICENSE.txt": "/BoardgameGuru/static/js/2.4752edbe.chunk.js.LICENSE.txt",
+    "static/media/defaultPostImg.jpg": "/BoardgameGuru/static/media/defaultPostImg.69d79931.jpg",
+    "static/media/noImageAvailable.jpg": "/BoardgameGuru/static/media/noImageAvailable.a25c1474.jpg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.8926dc09.js",
+    "static/css/2.664f5629.chunk.css",
+    "static/js/2.4752edbe.chunk.js",
+    "static/css/main.69429b8e.chunk.css",
+    "static/js/main.7584da12.chunk.js"
+  ]
+}
