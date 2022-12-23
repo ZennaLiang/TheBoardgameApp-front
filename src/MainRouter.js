@@ -44,6 +44,7 @@ class MainRouter extends React.Component {
         {/* <Chat /> */}
         <Switch>
           <Route exact path="/" render={() => <Home />} />
+          <Route exact path="/TheBoardgameApp-front" render={() => <Home />} />
           <Route exact path="/posts" component={Posts} />
           <Route exact path="/collection/bgg" component={BggCollection} />
           <PrivateRoute
