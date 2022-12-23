@@ -3,6 +3,7 @@ import { NavLink, withRouter } from "react-router-dom";
 import gsap from "gsap";
 import inView from "in-view";
 import Footer from "./Footer";
+import SVGComponent from "./SVGComponent";
 
 class Home extends React.Component {
   componentDidMount() {
@@ -78,7 +79,7 @@ class Home extends React.Component {
             </svg>
           </div>
           <div className="col-12 col-lg-4 px-5 py-2 d-flex justify-content-center align-items-start align-items-lg-center">
-            <img className="w-100" src="/board.svg" alt="gameboard" />
+            <SVGComponent className="w-100" />
             <NavLink to="/signup" className="btn btn-primary ctaButton">
               Get Started <i className="fa fa-arrow-right"></i>
             </NavLink>
