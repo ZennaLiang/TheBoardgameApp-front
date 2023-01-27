@@ -10,7 +10,7 @@ class TradeHistory extends React.Component {
     super();
     this.state = {
       redirectToHome: false,
-      historyData: [{}]
+      historyData: [{}],
     };
   }
   componentWillMount() {}
@@ -27,15 +27,19 @@ class TradeHistory extends React.Component {
       Animator.animate();
     }
 
-    getAllTradeRequestsById(userId).then(data => {
-      data.forEach((line, i) => {
-        if (line.tradeSender.name !== username) {
-          data[i].name = line.tradeSender.name;
-        } else {
-          data[i].name = line.tradeReceiver.name;
-        }
-        this.setState({ historyData: data });
-      });
+    getAllTradeRequestsById(userId).then((data) => {
+      if (data) {
+        data.forEach((line, i) => {
+          if (line.tradeSender.name !== username) {
+            data[i].name = line.tradeSender.name;
+          } else {
+            data[i].name = line.tradeReceiver.name;
+          }
+          this.setState({ historyData: data });
+        });
+      } else {
+        this.setState({ historyData: null });
+      }
     });
   }
 
@@ -60,15 +64,19 @@ class TradeHistory extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.historyData.map(line => {
-                  return (
-                    <TradeHistoryItem
-                      name={line.name}
-                      status={line.status}
-                      createdDate={line.createdDate}
-                    />
-                  );
-                })}
+                {this.state.historyData ? (
+                  this.state.historyData.map((line) => {
+                    return (
+                      <TradeHistoryItem
+                        name={line.name}
+                        status={line.status}
+                        createdDate={line.createdDate}
+                      />
+                    );
+                  })
+                ) : (
+                  <div>No History Available.</div>
+                )}
               </tbody>
             </table>
           </div>
