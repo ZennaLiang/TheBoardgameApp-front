@@ -18,6 +18,7 @@
   },
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://tselouie.github.io/TheBoardgameApp-front",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
@@ -40,11 +41,11 @@
     "match-sorter": "^4.0.2",
     "moment": "^2.29.1",
     "node-sass": "^4.14.1",
-    "react": "^16.12.0",
+    "react": "^16.13.0",
     "react-big-calendar": "^0.28.1",
     "react-bootstrap": "^1.4.0",
     "react-datepicker": "^3.3.0",
-    "react-dom": "^16.12.0",
+    "react-dom": "^16.13.0",
     "react-facebook-login": "^4.1.1",
     "react-google-login": "^5.1.0",
     "react-loading-overlay": "^1.0.1",
@@ -64,6 +65,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "test": "jest",
     "eject": "react-scripts eject"
   },
@@ -88,7 +91,8 @@
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
     "enzyme-to-json": "^3.6.1",
+    "gh-pages": "^4.0.0",
     "jest": "^26.6.3",
-    "react-test-renderer": "^17.0.1"
+    "react-test-renderer": "^16.3.0"
   }
 }

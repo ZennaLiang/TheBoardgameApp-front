@@ -34,16 +34,17 @@ import PrivateRoute from "./auth/PrivateRoute"; // only authenticated user can u
 import Admin from "./admin/Admin";
 import CalContainer from "./calendar/CalContainer";
 
-import Chat from "./chat/Chat";
+// import Chat from "./chat/Chat";
 
 class MainRouter extends React.Component {
   render() {
     return (
       <>
         <NavBar />
-        <Chat />
+        {/* <Chat /> */}
         <Switch>
           <Route exact path="/" render={() => <Home />} />
+          <Route exact path="/TheBoardgameApp-front" render={() => <Home />} />
           <Route exact path="/posts" component={Posts} />
           <Route exact path="/collection/bgg" component={BggCollection} />
           <PrivateRoute

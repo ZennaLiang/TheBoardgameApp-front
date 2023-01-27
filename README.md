@@ -66,7 +66,15 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
 # TheBoardgameApp-front
 
 ### MSRP Prices
+
 Prices are obtained from BoardgameAtlas API : https://www.boardgameatlas.com/api/docs
+
+### IMPORTANT
+
+Uses Node Version 16.18.0
+If node-sass wont install use this cmd:
+npm config set python "C:\Python27\python.exe"

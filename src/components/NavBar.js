@@ -3,8 +3,8 @@ import { NavLink, withRouter } from "react-router-dom"; // withRouter to access 
 import { signout, isAuthenticated } from "../auth";
 import BgLogo from "../images/BgLogo.png";
 //import Notification from "./notifications/Notification";
-import { getEventsByUserId } from "../calendar/apiCalendar";
-import { getAllTradeRequestsById } from "../trades/apiTrade";
+// import { getEventsByUserId } from "../calendar/apiCalendar";
+// import { getAllTradeRequestsById } from "../trades/apiTrade";
 import Helpers from "../helpers";
 import GettingStartedAlert from "./GettingStartedAlert";
 class NavBar extends React.Component {
