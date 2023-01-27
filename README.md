@@ -76,3 +76,5 @@ Prices are obtained from BoardgameAtlas API : https://www.boardgameatlas.com/api
 ### IMPORTANT
 
 Uses Node Version 16.18.0
+If node-sass wont install use this cmd:
+npm config set python "C:\Python27\python.exe"
