@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect, Link } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { getUser } from "./apiUser";
 import { isAuthenticated } from "../auth";
 import DefaultProfileImg from "../images/avatar.png";
@@ -81,7 +81,7 @@ class Profile extends Component {
 
   render() {
     const { redirectToSignin, user, posts } = this.state;
-    if (redirectToSignin) return <Redirect to="/signin" />;
+    if (redirectToSignin) return <Navigate to="/signin" />;
 
     // use new Date() to update image right away
     const photoUrl = user._id

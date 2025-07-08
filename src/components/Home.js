@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, withRouter } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import gsap from "gsap";
 import inView from "in-view";
 import Footer from "./Footer";
@@ -140,4 +140,4 @@ class Home extends React.Component {
     );
   }
 }
-export default withRouter(Home);
+export default Home;

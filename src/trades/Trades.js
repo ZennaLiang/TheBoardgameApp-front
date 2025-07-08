@@ -3,7 +3,7 @@ import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
 import TradeRequest from "./TradeRequest";
 import TradePending from "./TradePending";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import {
   getAllTradeRequestsById,
   deleteTrade,
@@ -138,7 +138,7 @@ class Trades extends React.Component {
 
   render() {
     const { redirectToHome } = this.state;
-    if (redirectToHome) return <Redirect to="/" />;
+    if (redirectToHome) return <Navigate to="/" />;
 
     return (
       <div className="container-fluid">

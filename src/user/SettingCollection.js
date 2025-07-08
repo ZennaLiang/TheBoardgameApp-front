@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage, getIn } from "formik";
 import * as Yup from "yup";
 import { isAuthenticated } from "../auth";
@@ -10,7 +10,7 @@ import {
   updateLocalStorUser,
 } from "./apiUser";
 
-import LoadingOverlay from "react-loading-overlay";
+import { Oval } from 'react-loader-spinner';
 import Alert from "../components/Alert";
 import SettingSidebar from "./SettingSideBar";
 
@@ -151,29 +151,19 @@ class SettingCollection extends Component {
     } = this.state;
 
     if (redirectToProfile) {
-      return <Redirect to={`/user/${id}`} />;
+      return <Navigate to={`/user/${id}`} />;
     }
 
     return (
       <>
         <Alert type={alertStatus} message={alertMsg} visible={alertVisible} />
-        <LoadingOverlay
-          active={loading}
-          spinner
-          styles={{
-            spinner: (base) => ({
-              ...base,
-              width: "100px",
-              "& svg circle": {
-                stroke: "rgba(0,98,204,1)",
-              },
-            }),
-            wrapper: {
-              height: "100%",
-            },
-          }}
-          text="Updating your profile...."
-        >
+     <Oval
+  height={40}
+  width={40}
+  color="#4fa94d"
+  visible={loading}
+  ariaLabel="oval-loading"
+>
           <div className="maxDivWidth container-fluid">
             <div className="row my-3">
               {/* SettingSidebar is col-sm-3 */}
@@ -210,7 +200,7 @@ class SettingCollection extends Component {
               </div>
             </div>
           </div>
-        </LoadingOverlay>
+        </Oval>
       </>
     );
   }

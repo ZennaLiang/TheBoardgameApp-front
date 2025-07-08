@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
-import GoogleLogin from "react-google-login";
-import FacebookLogin from "react-facebook-login";
+import { Navigate } from "react-router-dom";
+// import GoogleLogin from "react-google-login";
+// import FacebookLogin from "react-facebook-login";
 
 import { googleLogin, facebookLogin, authenticate } from "../auth";
 
@@ -76,12 +76,12 @@ class SocialLogins extends Component {
     const { redirectToReferrer } = this.state;
 
     if (redirectToReferrer) {
-      return <Redirect to="/posts" />;
+      return <Navigate to="/posts" />;
     }
 
     return (
       <div className="text-center social-btn">
-        <GoogleLogin
+        {/* <GoogleLogin
           clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
           onSuccess={this.responseGoogle}
           onFailure={this.responseGoogle}
@@ -110,7 +110,7 @@ class SocialLogins extends Component {
             <i className="fab fa-facebook" style={{ marginLeft: "5px" }}></i>
           }
           textButton={this.props.title + " with Facebook"}
-        />
+        /> */}
       </div>
     );
   }

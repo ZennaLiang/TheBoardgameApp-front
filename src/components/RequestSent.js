@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 
 class RequestSent extends React.Component {
@@ -11,7 +11,7 @@ state={
       }
     render() {
         if (this.state.redirect) {
-            return <Redirect to={this.state.redirect} />
+            return <Navigate to={this.state.redirect} />
           }
         return (
             <div className="container-fluid ">

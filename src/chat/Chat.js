@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { isAuthenticated } from "../auth";
 
 import {
@@ -579,4 +579,4 @@ class Chat extends React.Component {
   }
 }
 
-export default withRouter(Chat);
+export default Chat;

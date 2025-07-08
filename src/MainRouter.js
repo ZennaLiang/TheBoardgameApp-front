@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import Home from "./components/Home";
 import NavBar from "./components/NavBar";
@@ -42,54 +42,121 @@ class MainRouter extends React.Component {
       <>
         <NavBar />
         {/* <Chat /> */}
-        <Switch>
-          <Route exact path="/" render={() => <Home />} />
-          <Route exact path="/TheBoardgameApp-front" render={() => <Home />} />
-          <Route exact path="/posts" component={Posts} />
-          <Route exact path="/collection/bgg" component={BggCollection} />
-          <PrivateRoute
-            exact
-            path="/collection/bgguru"
-            component={UserBgCollection}
-          />
-          <PrivateRoute exact path="/trades" component={Trades} />
-          <PrivateRoute exact path="/trades/history" component={TradeHistory} />
-          <PrivateRoute
-            exact
-            path="/trades/settings"
-            component={TradeSettings}
-          />
-          <Route exact path="/requestSent" component={RequestSent} />
-          <Route exact path="/newTrade" component={TradeListItems} />
-          <PrivateRoute exact path="/admin" component={Admin} />
-          <Route exact path="/forgot-password" component={ForgotPassword} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/TheBoardgameApp-front" element={<Home />} />
+          <Route path="/posts" element={<Posts />} />
+          <Route path="/collection/bgg" element={<BggCollection />} />
+
           <Route
-            exact
+            path="/collection/bgguru"
+            element={
+              <PrivateRoute>
+                <UserBgCollection />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/trades"
+            element={
+              <PrivateRoute>
+                <Trades />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/trades/history"
+            element={
+              <PrivateRoute>
+                <TradeHistory />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/trades/settings"
+            element={
+              <PrivateRoute>
+                <TradeSettings />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path="/requestSent" element={<RequestSent />} />
+          <Route path="/newTrade" element={<TradeListItems />} />
+
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute>
+                <Admin />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
             path="/reset-password/:resetPasswordToken"
-            component={ResetPassword}
+            element={<ResetPassword />}
           />
-          <PrivateRoute exact path="/post/create" component={NewPost} />
-          <PrivateRoute exact path="/post/edit/:postId" component={EditPost} />
-          <Route exact path="/post/:postId" component={Post} />
-          <Route exact path="/Users" component={Users} />
-          <Route exact path="/signup" component={Signup} />
-          <Route exact path="/signin" component={Signin} />
-          <PrivateRoute exact path="/findpeople" component={FindPeople} />
-          <PrivateRoute exact path="/user/:userId" component={Profile} />
-          <PrivateRoute
-            exact
+
+          <Route
+            path="/post/create"
+            element={
+              <PrivateRoute>
+                <NewPost />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/post/edit/:postId"
+            element={
+              <PrivateRoute>
+                <EditPost />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/post/:postId" element={<Post />} />
+          <Route path="/Users" element={<Users />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<Signin />} />
+
+          <Route
+            path="/findpeople"
+            element={
+              <PrivateRoute>
+                <FindPeople />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/user/:userId"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/user/edit/:userId"
-            component={SettingUser}
+            element={
+              <PrivateRoute>
+                <SettingUser />
+              </PrivateRoute>
+            }
           />
-          <PrivateRoute
-            exact
+          <Route
             path="/user/edit/bgg/:userId"
-            component={SettingCollection}
+            element={
+              <PrivateRoute>
+                <SettingCollection />
+              </PrivateRoute>
+            }
           />
-          <Route exact path="/calendar/:userId" component={CalContainer} />
-          <Route path="/404" component={NotFound} />
-          <Route path="*" component={NotFound} />
-        </Switch>
+
+          <Route path="/calendar/:userId" element={<CalContainer />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </>
     );
   }

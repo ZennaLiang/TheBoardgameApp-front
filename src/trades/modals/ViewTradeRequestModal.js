@@ -2,7 +2,7 @@ import React from "react";
 import ReactModal from 'react-modal';
 import { FormGroup, Label, Input } from 'reactstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 
 export default class ViewTradeRequestModal extends React.Component {
@@ -39,7 +39,7 @@ export default class ViewTradeRequestModal extends React.Component {
 
 
     if (this.state.redirect) {
-      return <Redirect to={{
+      return <Navigate to={{
         pathname: this.state.redirect,
         state: { tradeId: this.state.tradeId }
       }} />

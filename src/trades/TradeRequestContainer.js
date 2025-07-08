@@ -8,7 +8,7 @@ import { getUserId } from "../user/apiUser";
 import { getGuruCollection } from "../boardgame/apiBoardgame";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
-import { FormGroup, Input, InputGroupAddon, Alert } from "reactstrap";
+import { FormGroup, Input, InputGroupText, Alert } from "reactstrap";
 import { Link } from "react-router-dom";
 
 class TradeRequestContainer extends React.Component {
@@ -206,7 +206,7 @@ class TradeRequestContainer extends React.Component {
                       this.handleEnterKey(e);
                     }}
                   />
-                  <InputGroupAddon addonType="append">
+                  <InputGroupText>
                     <Button
                       variant="primary"
                       className="rounded"
@@ -214,7 +214,7 @@ class TradeRequestContainer extends React.Component {
                     >
                       <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
                     </Button>
-                  </InputGroupAddon>
+                  </InputGroupText>
                   &nbsp;
                   <Input
                     id="clear"

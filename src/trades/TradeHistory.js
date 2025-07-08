@@ -1,7 +1,7 @@
 import React from "react";
 import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Animator from "../animator/Animator";
 import { getAllTradeRequestsById } from "./apiTrade";
 import TradeHistoryItem from "./TradeHistoryItem";
@@ -45,7 +45,7 @@ class TradeHistory extends React.Component {
 
   render() {
     const { redirectToHome } = this.state;
-    if (redirectToHome) return <Redirect to="/" />;
+    if (redirectToHome) return <Navigate to="/" />;
 
     return (
       <div className="container-fluid">

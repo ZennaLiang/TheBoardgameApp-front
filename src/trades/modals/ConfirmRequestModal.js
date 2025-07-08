@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
 import { createTrade } from "../apiTrade";
 import { isAuthenticated } from "../../auth";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 export default class ConfirmRequestModal extends React.Component {
   state = {
@@ -48,7 +48,7 @@ export default class ConfirmRequestModal extends React.Component {
 
     if (this.state.redirect) {
       return (
-        <Redirect
+        <Navigate
           to={{
             pathname: this.state.redirect,
             state: { tradeId: this.state.tradeId }

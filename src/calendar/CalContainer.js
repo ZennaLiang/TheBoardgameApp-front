@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import "./calStyle.css";
 
 import SideBar from "./CalSideBar";
@@ -45,7 +45,7 @@ const CalContainer = (props) => {
   return (
     <>
       {redirectTo ? (
-        <Redirect to={`/404`} />
+        <Navigate to={`/404`} />
       ) : (
         <EventContext.Provider value={eventValues}>
           <div className="container-fluid calContainer">

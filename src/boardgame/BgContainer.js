@@ -1,7 +1,7 @@
 import React from "react";
 import { isAuthenticated } from "../auth";
 import BgSideBar from "./BgSideBar";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 class BgContainer extends React.Component {
   constructor() {
     super();
@@ -21,7 +21,7 @@ class BgContainer extends React.Component {
 
   render() {
     const { redirectToHome } = this.state;
-    if (redirectToHome) return <Redirect to="/" />;
+    if (redirectToHome) return <Navigate to="/" />;
 
     return (
       <div className="container-fluid px-0">

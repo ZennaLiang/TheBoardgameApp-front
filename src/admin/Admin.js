@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Posts from "../post/Posts";
 import Users from "../user/Users";
 import { isAuthenticated } from "../auth";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 class Admin extends Component {
     state = {
@@ -17,7 +17,7 @@ class Admin extends Component {
 
     render() {
         if (this.state.redirectToHome) {
-            return <Redirect to="/" />;
+            return <Navigate to="/" />;
         }
 
         return (

@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, withRouter } from "react-router-dom"; // withRouter to access history location-URL link
+import { NavLink } from "react-router-dom"; // withRouter to access history location-URL link
 import { signout, isAuthenticated } from "../auth";
 import BgLogo from "../images/BgLogo.png";
 //import Notification from "./notifications/Notification";
@@ -259,4 +259,4 @@ class NavBar extends React.Component {
   }
 }
 
-export default withRouter(NavBar);
+export default NavBar;

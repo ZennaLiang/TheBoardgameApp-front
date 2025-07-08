@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Alert from "@material-ui/lab/Alert";
+import { styled } from "@mui/material/styles";
+import Alert from "@mui/material/Alert";
+
 import { Link } from "react-router-dom";
 import { isAuthenticated } from "../auth";
 import { getUser } from "../user/apiUser";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = styled((theme) => ({
   root: {
     width: "100%",
     "& > * + *": {
-      marginTop: theme.spacing(2)
-    }
-  }
+      marginTop: theme.spacing(2),
+    },
+  },
 }));
 
 export default function GettingstartedAlert() {
@@ -20,7 +21,7 @@ export default function GettingstartedAlert() {
   const [hasSynced, setSync] = useState(false);
   if (isAuthenticated()) {
     getUser(isAuthenticated().user._id, isAuthenticated().token).then(
-      person => {
+      (person) => {
         if (person.bggUsername) {
           setSync(true);
         } else {

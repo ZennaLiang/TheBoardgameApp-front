@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { isAuthenticated } from "../auth";
 import { removeUser } from "./apiUser";
@@ -39,7 +39,7 @@ class DeleteUser extends Component {
 
     render() {
         if (this.state.redirect) {
-            return <Redirect to="/" />;
+            return <Navigate to="/" />;
         }
         return (
             <button

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { isAuthenticated } from "../auth";
 import { createPost } from "./apiPost";
@@ -150,7 +150,7 @@ class NewPost extends Component {
     } = this.state;
 
     if (redirectToProfile) {
-      return <Redirect to={`/user/${user._id}`} />;
+      return <Navigate to={`/user/${user._id}`} />;
     }
 
     return (

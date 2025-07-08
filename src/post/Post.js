@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import { getPost, removePost, likePost, unlikePost } from "./apiPost";
 import DefaultPostImg from "../images/defaultPostImg.jpg";
@@ -184,9 +184,9 @@ class Post extends Component {
         const { post, redirectToPosts, redirectToSignin, comments } = this.state;
 
         if (redirectToPosts) {
-            return <Redirect to={`/posts`} />;
+            return <Navigate to={`/posts`} />;
         } else if (redirectToSignin) {
-            return <Redirect to={`/signin`} />;
+            return <Navigate to={`/signin`} />;
         }
 
         return (

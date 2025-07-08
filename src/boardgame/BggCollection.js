@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import LoadingOverlay from "react-loading-overlay";
+import { Oval } from "react-loader-spinner";
 import { useTable, useFilters, usePagination } from "react-table";
-import matchSorter from "match-sorter";
+import { matchSorter } from "match-sorter";
 
 import { getBGCollection } from "./apiBoardgame";
 import Alert from "../components/Alert";
@@ -415,22 +415,12 @@ const BggCollection = () => {
   return (
     <>
       <Alert type={alertStatus} message={alertMsg} visible={alertVisible} />
-      <LoadingOverlay
-        active={isLoading}
-        spinner
-        styles={{
-          spinner: (base) => ({
-            ...base,
-            width: "100px",
-            "& svg circle": {
-              stroke: "rgba(0,98,204,1)",
-            },
-          }),
-          wrapper: {
-            height: "100%",
-          },
-        }}
-        text="Fetching Collection....."
+      <Oval
+        height={40}
+        width={40}
+        color="#4fa94d"
+        visible={true}
+        ariaLabel="oval-loading"
       >
         <BgContainer sidebar="BggCollection">
           <div className="container-fluid">
@@ -476,7 +466,7 @@ const BggCollection = () => {
             </div>
           </div>
         </BgContainer>
-      </LoadingOverlay>
+      </Oval>
     </>
   );
 };
