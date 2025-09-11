@@ -4,9 +4,23 @@ import { Link } from "react-router-dom";
 import { getUsers } from "./apiUser";
 import DefaultProfileImg from "../images/avatar.png";
 import Animator from "../animator/Animator";
-class Users extends Component {
-  constructor() {
-    super();
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  photo?: boolean;
+}
+
+interface UsersProps {}
+
+interface UsersState {
+  users: User[];
+}
+
+class Users extends Component<UsersProps, UsersState> {
+  constructor(props: UsersProps) {
+    super(props);
     this.state = {
       users: [],
     };
@@ -23,7 +37,7 @@ class Users extends Component {
     });
   }
 
-  renderUsers = (users) => (
+  renderUsers = (users: User[]) => (
     <div className="row">
       {users.map((user, i) => (
         <div className="card col-md-4 animator">

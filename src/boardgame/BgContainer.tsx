@@ -2,9 +2,20 @@ import React from "react";
 import { isAuthenticated } from "../auth";
 import BgSideBar from "./BgSideBar";
 import { Navigate } from "react-router-dom";
-class BgContainer extends React.Component {
-  constructor() {
-    super();
+
+interface BgContainerProps {
+  userId: string;
+  sidebar?: any;
+  children: React.ReactNode;
+}
+
+interface BgContainerState {
+  redirectToHome: boolean;
+}
+
+class BgContainer extends React.Component<BgContainerProps, BgContainerState> {
+  constructor(props: BgContainerProps) {
+    super(props);
     this.state = {
       redirectToHome: false,
     };

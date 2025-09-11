@@ -6,7 +6,39 @@ import DefaultPostImg from "../images/defaultPostImg.jpg";
 import { isAuthenticated } from "../auth";
 import PostComments from "./PostComments";
 
-class Post extends Component {
+interface PostUser {
+  _id: string;
+  name: string;
+}
+
+interface PostData {
+  _id: string;
+  title: string;
+  body: string;
+  postedBy: PostUser;
+  likes: string[];
+  comments: any[];
+  createdDate: string;
+}
+
+interface PostProps {
+  match: {
+    params: {
+      postId: string;
+    };
+  };
+}
+
+interface PostState {
+  post: PostData | string;
+  redirectToPosts: boolean;
+  redirectToSignin: boolean;
+  like: boolean;
+  likes: number;
+  comments: any[];
+}
+
+class Post extends Component<PostProps, PostState> {
     state = {
         post: "",
         redirectToPosts: false,
@@ -32,7 +64,7 @@ class Post extends Component {
         });
     };
 
-    isLiked = likes => {
+    isLiked = (likes: string[]) => {
         const userId = isAuthenticated() && isAuthenticated().user._id;
         let match = likes.indexOf(userId) !== -1;
         return match;
@@ -81,11 +113,11 @@ class Post extends Component {
         }
     };
 
-    updateComments = comments => {
+    updateComments = (comments: any[]) => {
         this.setState({ comments });
     };
 
-    renderPost = post => {
+    renderPost = (post: PostData) => {
         const posterId = post.postedBy ? `/user/${post.postedBy._id}` : "";
         const posterName = post.postedBy ? post.postedBy.name : " Unknown";
 
@@ -189,23 +221,27 @@ class Post extends Component {
             return <Navigate to={`/signin`} />;
         }
 
+        const postData = post as PostData;
+
         return (
             <div className="container">
-                <h2 className="display-2 mt-5 mb-5">{post.title}</h2>
+                <h2 className="display-2 mt-5 mb-5">{typeof post === 'string' ? '' : postData.title}</h2>
 
-                {!post ? (
+                {typeof post === 'string' || !post ? (
                     <div className="jumbotron text-center">
                         <h2>Loading...</h2>
                     </div>
                 ) : (
-                    this.renderPost(post)
+                    this.renderPost(postData)
                 )}
 
-                <PostComments
-                    postId={post._id}
-                    comments={comments.reverse()}
-                    updateComments={this.updateComments}
-                />
+                {typeof post !== 'string' && post && (
+                    <PostComments
+                        postId={postData._id}
+                        comments={comments.reverse()}
+                        updateComments={this.updateComments}
+                    />
+                )}
             </div>
         );
     }

@@ -1,5 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
+interface AlertProps {
+  type: string;
+  message: string;
+  visible: boolean;
+  redirectTo?: string;
+  redirectTxt?: string;
+  className?: string;
+}
+
 /**********************************************************************
 This component have the following props for bootstrap Alert:
 
@@ -18,7 +28,7 @@ const [alertVisible, setAlertVible] = useState(false);
 const [alertRedirect, setAlertRedirect] = useState("");
 const [alertRedirectTxt, setAlertRedirectTxt] = useState("");
 **********************************************************************/
-class Alert extends React.Component {
+class Alert extends React.Component<AlertProps> {
   render() {
     if (this.props.visible === true) {
       return (

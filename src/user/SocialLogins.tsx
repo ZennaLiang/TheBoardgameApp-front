@@ -5,6 +5,14 @@ import { Navigate } from "react-router-dom";
 
 import { googleLogin, facebookLogin, authenticate } from "../auth";
 
+interface SocialLoginsProps {
+  title: string;
+}
+
+interface SocialLoginsState {
+  redirectToReferrer: boolean;
+}
+
 /* Need google oAuth clientID for google login
 1. Go to https://console.cloud.google.com/apis/credentials/oauthclient
 2. GO to OAuth consent screen on left side bar 
@@ -26,15 +34,15 @@ import { googleLogin, facebookLogin, authenticate } from "../auth";
 3. Go to Settings -> Basic on left sidebar
     - App Domains - localhost   
  */
-class SocialLogins extends Component {
-  constructor() {
-    super();
+class SocialLogins extends Component<SocialLoginsProps, SocialLoginsState> {
+  constructor(props: SocialLoginsProps) {
+    super(props);
     this.state = {
       redirectToReferrer: false,
     };
   }
 
-  responseGoogle = (response) => {
+  responseGoogle = (response: any) => {
     //console.log(response);
     const tokenId = response.tokenId;
     const user = {
@@ -52,7 +60,7 @@ class SocialLogins extends Component {
     });
   };
 
-  responseFacebook = (response) => {
+  responseFacebook = (response: any) => {
     const { id, name, email, picture } = response;
     const user = {
       password: id,

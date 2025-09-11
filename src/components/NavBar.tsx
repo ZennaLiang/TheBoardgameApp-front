@@ -7,7 +7,12 @@ import BgLogo from "../images/BgLogo.png";
 // import { getAllTradeRequestsById } from "../trades/apiTrade";
 import Helpers from "../helpers";
 import GettingStartedAlert from "./GettingStartedAlert";
-class NavBar extends React.Component {
+
+interface NavBarProps {}
+
+interface NavBarState {}
+
+class NavBar extends React.Component<NavBarProps, NavBarState> {
   // constructor() {
   //   super();
   //   // if (isAuthenticated().user) {

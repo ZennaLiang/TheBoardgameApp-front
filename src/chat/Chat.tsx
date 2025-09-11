@@ -16,13 +16,53 @@ import DefaultProfileImg from "../images/avatar.png";
 
 import "../css/chat.scss";
 
-class Chat extends React.Component {
-  constructor() {
-    super();
+interface ChatUser {
+  _id: string;
+  name: string;
+}
+
+interface ChatMessage {
+  _id: string;
+  from: string | ChatUser;
+  message: string;
+  timestamp: string;
+}
+
+interface ChatData {
+  _id: string;
+  between: ChatUser[];
+  messages: ChatMessage[];
+}
+
+interface ToastMessage {
+  type: string;
+  message: string;
+}
+
+interface ChatProps {}
+
+interface ChatState {
+  isOpen: boolean;
+  chatSelected: boolean;
+  selectedChat: ChatData;
+  user: any;
+  chats: ChatData[];
+  newMessage: boolean;
+  loading: string | null;
+  muted: boolean;
+  userSearchResults: ChatUser[];
+  toastMsg: ToastMessage | null;
+}
+
+class Chat extends React.Component<ChatProps, ChatState> {
+  searchTimeout: NodeJS.Timeout | undefined;
+
+  constructor(props: ChatProps) {
+    super(props);
     this.state = {
       isOpen: false,
       chatSelected: false,
-      selectedChat: {},
+      selectedChat: {} as ChatData,
       user: isAuthenticated().user,
       chats: [],
       newMessage: false,
@@ -33,7 +73,7 @@ class Chat extends React.Component {
     };
   }
 
-  toast = (message, type = "danger") => {
+  toast = (message: string, type: string = "danger") => {
     this.setState({
       toastMsg: { type, message }
     });
@@ -186,9 +226,8 @@ class Chat extends React.Component {
     }
   };
 
-  searchTimeout;
 
-  searchUser = e => {
+  searchUser = (e: any) => {
     clearTimeout(this.searchTimeout);
     this.setState({
       loading: "searchUsers"
@@ -227,7 +266,7 @@ class Chat extends React.Component {
     }, 200);
   };
 
-  selectUser = e => {
+  selectUser = (e: any) => {
     document.getElementById("usernameSearch").value = e.target.dataset.username;
     this.createChat();
     this.setState({
@@ -235,7 +274,7 @@ class Chat extends React.Component {
     });
   };
 
-  getChat = async e => {
+  getChat = async (e: any) => {
     try {
       let id = e.currentTarget.dataset.id;
 
@@ -298,8 +337,8 @@ class Chat extends React.Component {
     }
   };
 
-  chatIsFromUser = from => {
-    let id = from._id ? from._id : from;
+  chatIsFromUser = (from: string | ChatUser) => {
+    let id = typeof from === 'string' ? from : from._id;
     return id === isAuthenticated().user._id;
   };
 

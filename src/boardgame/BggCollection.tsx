@@ -66,18 +66,18 @@ const PlayTimeSelectFilter = ({ column: { filterValue, setFilter } }) => {
   );
 };
 
-const fuzzyTextFilterFn = (rows, id, filterValue) => {
-  return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+const fuzzyTextFilterFn = (rows: any[], id: string, filterValue: string) => {
+  return matchSorter(rows, filterValue, { keys: [(row: any) => row.values[id]] });
 };
 
 // Let the table remove the filter if the string is empty
-fuzzyTextFilterFn.autoRemove = (val) => !val;
+fuzzyTextFilterFn.autoRemove = (val: any) => !val;
 
-const Table = ({ columns, data }) => {
+const Table = ({ columns, data }: { columns: any[]; data: any[] }) => {
   const filterTypes = React.useMemo(
     () => ({
       fuzzyText: fuzzyTextFilterFn,
-      text: (rows, id, filterValue) => {
+      text: (rows: any[], id: string, filterValue: string) => {
         return rows.filter((row) => {
           const rowValue = row.values[id];
           return rowValue !== undefined

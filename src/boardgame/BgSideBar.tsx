@@ -4,16 +4,27 @@ import React from "react";
 
 import { getUser } from "../user/apiUser";
 
-class BgSideBar extends React.Component {
-  constructor() {
-    super();
+interface BgSideBarProps {
+  highlight?: any;
+  userId: string;
+}
+
+interface BgSideBarState {
+  name: string;
+  loading: boolean;
+  file: any;
+}
+
+class BgSideBar extends React.Component<BgSideBarProps, BgSideBarState> {
+  constructor(props: BgSideBarProps) {
+    super(props);
     this.state = {
       name: "",
       loading: false,
       file: null,
     };
   }
-  init = (userId) => {
+  init = (userId: string) => {
     const token = isAuthenticated().token;
     getUser(userId, token).then((data) => {
       if (data.error) {

@@ -269,12 +269,12 @@ const YesNoSelectFilter = ({ column: { filterValue, setFilter } }) => {
     </select>
   );
 };
-const fuzzyTextFilterFn = (rows, id, filterValue) => {
-  return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+const fuzzyTextFilterFn = (rows: any[], id: string, filterValue: string) => {
+  return matchSorter(rows, filterValue, { keys: [(row: any) => row.values[id]] });
 };
 
 // Let the table remove the filter if the string is empty
-fuzzyTextFilterFn.autoRemove = (val) => !val;
+fuzzyTextFilterFn.autoRemove = (val: any) => !val;
 
 /****************************************************/
 /*************** Custom filter fxns *****************/

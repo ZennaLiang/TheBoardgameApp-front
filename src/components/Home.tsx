@@ -5,7 +5,11 @@ import inView from "in-view";
 import Footer from "./Footer";
 import SVGComponent from "./SVGComponent";
 
-class Home extends React.Component {
+interface HomeProps {}
+
+interface HomeState {}
+
+class Home extends React.Component<HomeProps, HomeState> {
   componentDidMount() {
     let tl = gsap.timeline();
     tl.set(".animator", {

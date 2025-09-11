@@ -18,11 +18,16 @@ describe("Auth API calls", () => {
       password: "Abcd1234",
       matchPassword: "Abcd1234"
     };
-    global.fetch = jest.fn(() => {
-      signup(testUser).then(data => {
-        console.log(data);
-        expect(data).toBeTruthy();
-      });
+    global.fetch = jest.fn(() => 
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ user: testUser })
+      } as Response)
+    );
+    
+    signup(testUser).then(data => {
+      console.log(data);
+      expect(data).toBeTruthy();
     });
   });
 
@@ -33,11 +38,16 @@ describe("Auth API calls", () => {
       password: "abc123",
       matchPassword: "Abcd1234"
     };
-    global.fetch = jest.fn(() => {
-      signup(testUser).then(data => {
-        console.log(data.debug());
-        expect(data).toBeFalsey();
-      });
+    global.fetch = jest.fn(() => 
+      Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve({ error: "Validation failed" })
+      } as Response)
+    );
+    
+    signup(testUser).then(data => {
+      console.log(data);
+      expect(data).toBeFalsy();
     });
   });
 });
