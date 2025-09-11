@@ -36,130 +36,128 @@ import CalContainer from "./calendar/CalContainer";
 
 // import Chat from "./chat/Chat";
 
-class MainRouter extends React.Component {
-  render() {
-    return (
-      <>
-        <NavBar />
-        {/* <Chat /> */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/TheBoardgameApp-front" element={<Home />} />
-          <Route path="/posts" element={<Posts />} />
-          <Route path="/collection/bgg" element={<BggCollection />} />
+const MainRouter: React.FC = () => {
+  return (
+    <>
+      <NavBar />
+      {/* <Chat /> */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/TheBoardgameApp-front" element={<Home />} />
+        <Route path="/posts" element={<Posts />} />
+        <Route path="/collection/bgg" element={<BggCollection />} />
 
-          <Route
-            path="/collection/bgguru"
-            element={
-              <PrivateRoute>
-                <UserBgCollection />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/trades"
-            element={
-              <PrivateRoute>
-                <Trades />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/trades/history"
-            element={
-              <PrivateRoute>
-                <TradeHistory />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/trades/settings"
-            element={
-              <PrivateRoute>
-                <TradeSettings />
-              </PrivateRoute>
-            }
-          />
+        <Route
+          path="/collection/bgguru"
+          element={
+            <PrivateRoute>
+              <UserBgCollection />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/trades"
+          element={
+            <PrivateRoute>
+              <Trades />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/trades/history"
+          element={
+            <PrivateRoute>
+              <TradeHistory />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/trades/settings"
+          element={
+            <PrivateRoute>
+              <TradeSettings />
+            </PrivateRoute>
+          }
+        />
 
-          <Route path="/requestSent" element={<RequestSent />} />
-          <Route path="/newTrade" element={<TradeListItems />} />
+        <Route path="/requestSent" element={<RequestSent />} />
+        <Route path="/newTrade" element={<TradeListItems />} />
 
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute>
-                <Admin />
-              </PrivateRoute>
-            }
-          />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <Admin />
+            </PrivateRoute>
+          }
+        />
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="/reset-password/:resetPasswordToken"
-            element={<ResetPassword />}
-          />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/reset-password/:resetPasswordToken"
+          element={<ResetPassword />}
+        />
 
-          <Route
-            path="/post/create"
-            element={
-              <PrivateRoute>
-                <NewPost />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/post/edit/:postId"
-            element={
-              <PrivateRoute>
-                <EditPost />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/post/:postId" element={<Post />} />
-          <Route path="/Users" element={<Users />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/signin" element={<Signin />} />
+        <Route
+          path="/post/create"
+          element={
+            <PrivateRoute>
+              <NewPost />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/post/edit/:postId"
+          element={
+            <PrivateRoute>
+              <EditPost />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/post/:postId" element={<Post />} />
+        <Route path="/Users" element={<Users />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<Signin />} />
 
-          <Route
-            path="/findpeople"
-            element={
-              <PrivateRoute>
-                <FindPeople />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/user/:userId"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/user/edit/:userId"
-            element={
-              <PrivateRoute>
-                <SettingUser />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/user/edit/bgg/:userId"
-            element={
-              <PrivateRoute>
-                <SettingCollection />
-              </PrivateRoute>
-            }
-          />
+        <Route
+          path="/findpeople"
+          element={
+            <PrivateRoute>
+              <FindPeople />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/user/:userId"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/user/edit/:userId"
+          element={
+            <PrivateRoute>
+              <SettingUser />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/user/edit/bgg/:userId"
+          element={
+            <PrivateRoute>
+              <SettingCollection />
+            </PrivateRoute>
+          }
+        />
 
-          <Route path="/calendar/:userId" element={<CalContainer />} />
-          <Route path="/404" element={<NotFound />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </>
-    );
-  }
-}
+        <Route path="/calendar/:userId" element={<CalContainer />} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+};
 
 export default MainRouter;

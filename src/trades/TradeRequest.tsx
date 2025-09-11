@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -10,31 +10,46 @@ import { getTradeRequestById } from "./apiTrade";
 import { UncontrolledCollapse, Button, CardBody, Card } from "reactstrap";
 import Helpers from "../helpers";
 
-class TradeRequest extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      redirectToHome: faClosedCaptioning,
-      show: false,
-      trade: {},
-      isLoading: true
-    };
-  }
+interface TradeRequestProps {
+  id?: string;
+  header: string;
+  trades: any[];
+  deleteText: string;
+  successButton?: string;
+  onClickDelete: (tradeId: string) => void;
+  onClickAccept?: (tradeId: string) => void;
+}
 
-  componentDidUpdate(prevProps) {
-    if (this.props.id !== prevProps.id) {
-      this.setState({ id: this.props.id });
+const TradeRequest: React.FC<TradeRequestProps> = ({
+  id,
+  header,
+  trades,
+  deleteText,
+  successButton,
+  onClickDelete,
+  onClickAccept
+}) => {
+  const [redirectToHome] = useState(faClosedCaptioning);
+  const [show, setShow] = useState(false);
+  const [trade, setTrade] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentId, setCurrentId] = useState(id);
+
+  useEffect(() => {
+    if (id !== currentId) {
+      setCurrentId(id);
     }
-  }
+  }, [id, currentId]);
 
-  showModal = e => {
+  const showModal = (e: React.MouseEvent<HTMLButtonElement>) => {
     getTradeRequestById(e.currentTarget.id).then(data => {
       console.log(data);
-      this.setState({ show: !this.state.show, trade: data });
+      setShow(!show);
+      setTrade(data);
     });
   };
 
-  badgeBgRender = condition => {
+  const badgeBgRender = (condition: string) => {
     switch (condition) {
       case "Excellent":
         return "badge-success";
@@ -49,11 +64,10 @@ class TradeRequest extends React.Component {
     }
   };
 
-  render() {
-    return (
+  return (
       <div className="card">
         <div className="card-header font-weight-bold">
-          {this.props.header}
+          {header}
 
           <Button
             className="additionalActions bg-white "
@@ -70,7 +84,7 @@ class TradeRequest extends React.Component {
         </div>
 
         <div className="card-body">
-          {this.props.trades.map(trade => {
+          {trades.map(trade => {
             console.log(trade);
             return (
               <div key={trade._id}>
@@ -80,7 +94,7 @@ class TradeRequest extends React.Component {
                   className="col-12"
                   style={{ marginBottom: "1rem" }}
                 >
-                  {this.props.header === "Waiting for Response" ? (
+                  {header === "Waiting for Response" ? (
                     <div className="float-left pl-3">
                       {trade.tradeReceiver.photo ? (
                         <img
@@ -151,7 +165,7 @@ class TradeRequest extends React.Component {
                             <p key={game._id}>
                               {game.name}
                               <span
-                                className={`badge ${this.badgeBgRender(
+                                className={`badge ${badgeBgRender(
                                   game.condition
                                 )} float-right mt-1`}
                               >
@@ -175,7 +189,7 @@ class TradeRequest extends React.Component {
                             <p key={game._id}>
                               {game.name}{" "}
                               <span
-                                className={`badge ${this.badgeBgRender(
+                                className={`badge ${badgeBgRender(
                                   game.condition
                                 )} float-right mt-1`}
                               >
@@ -203,21 +217,21 @@ class TradeRequest extends React.Component {
                       </div>
                       <button
                         type="button"
-                        onClick={() => this.props.onClickDelete(trade._id)}
+                        onClick={() => onClickDelete(trade._id)}
                         className="btn btn-danger float-right"
                       >
                         <FontAwesomeIcon icon={faTimes} />{" "}
-                        {this.props.deleteText}
+                        {deleteText}
                       </button>
 
-                      {this.props.successButton === "Accept" ? (
+                      {successButton === "Accept" ? (
                         <button
                           type="button"
-                          onClick={() => this.props.onClickAccept(trade._id)}
+                          onClick={() => onClickAccept?.(trade._id)}
                           className="btn btn-success float-right mr-2"
                         >
                           <FontAwesomeIcon icon={faCheck} />
-                          {this.props.successButton}
+                          {successButton}
                         </button>
                       ) : null}
                     </CardBody>
@@ -229,6 +243,6 @@ class TradeRequest extends React.Component {
         </div>
       </div>
     );
-  }
-}
+};
+
 export default TradeRequest;

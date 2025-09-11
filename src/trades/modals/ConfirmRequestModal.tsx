@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ReactModal from "react-modal";
 import { FormGroup, Label, Input } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,211 +7,193 @@ import { createTrade } from "../apiTrade";
 import { isAuthenticated } from "../../auth";
 import { Navigate } from "react-router-dom";
 
-export default class ConfirmRequestModal extends React.Component {
-  state = {
-    notes: "",
-    redirect: null,
-    tradeId: null
-  };
+interface ConfirmRequestModalProps {
+  show: boolean;
+  onClose: () => void;
+  tradeData: any;
+}
 
-  componentWillMount() {
+const ConfirmRequestModal: React.FC<ConfirmRequestModalProps> = ({
+  show,
+  onClose,
+  tradeData
+}) => {
+  const [notes, setNotes] = useState("");
+  const [redirect, setRedirect] = useState<string | null>(null);
+  const [tradeId, setTradeId] = useState<string | null>(null);
+
+  useEffect(() => {
     //Required to use modal or else it has errors
     ReactModal.setAppElement("body");
-  }
+  }, []);
 
-  onClose = e => {
-    this.props.onClose && this.props.onClose(e);
+  const handleClose = () => {
+    onClose && onClose();
   };
-  submitTrade = () => {
+
+  const submitTrade = () => {
     const token = isAuthenticated().token;
-    this.props.tradeData.notes = document.getElementById("tradeNotes").value;
-    console.log(this.props.tradeData);
-    createTrade(token, this.props.tradeData).then(data => {
+    const tradeNotesElement = document.getElementById("tradeNotes") as HTMLTextAreaElement;
+    tradeData.notes = tradeNotesElement.value;
+    console.log(tradeData);
+    createTrade(token, tradeData).then(data => {
       //data returned is only _id of trade
-      this.setState({ redirect: "/requestSent", tradeId: data });
+      setRedirect("/requestSent");
+      setTradeId(data);
     });
   };
 
-  render() {
-    const style = {
-      content: {
-        borderRadius: "4px",
-        bottom: "100px",
-        left: "15%",
-        position: "absolute",
-        right: "25%",
-        top: "100px",
-        width: "80%",
-        height: "60%"
-      }
-    };
-
-    if (this.state.redirect) {
-      return (
-        <Navigate
-          to={{
-            pathname: this.state.redirect,
-            state: { tradeId: this.state.tradeId }
-          }}
-        />
-      );
-      // return <RequestSent redirect={this.state.redirect}></RequestSent>
+  const style = {
+    content: {
+      borderRadius: "4px",
+      bottom: "100px",
+      left: "15%",
+      position: "absolute" as const,
+      right: "25%",
+      top: "100px",
+      width: "80%",
+      height: "60%"
     }
-    return (
-      <ReactModal
-        isOpen={this.props.show}
-        style={style}
-        onRequestClose={this.onClose}
-      >
-        <div className="container-fluid">
-          <div>
-            <h1>
-              Confirm Request
-              <button
-                type="button"
-                className="close float-right"
-                onClick={this.onClose}
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </h1>
-          </div>
-          <div className="row">
-            <div className="col-6">
-              <h3>You</h3>
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.props.tradeData.userTradeList.map(item => {
-                    return (
-                      <tr key={item.id}>
-                        <td>
-                          {item.bg.boardgame.title}{" "}
-                          {(function() {
-                            switch (item.bg.condition) {
-                              case "Excellent":
-                                return (
-                                  <span className="badge badge-success float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              case "Good":
-                                return (
-                                  <span className="badge badge-primary float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              case "Fair":
-                                return (
-                                  <span className="badge badge-warning float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              case "Poor":
-                                return (
-                                  <span className="badge badge-danger float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              default:
-                                return null;
-                            }
-                          })()}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+  };
 
-            <div className="col-6">
-              <h3>{this.props.tradeData.searchedUser}</h3>
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.props.tradeData.searchedUserTradeList.map(item => {
-                    return (
-                      <tr key={item.id}>
-                        <td>
-                          {item.bg.boardgame.title}{" "}
-                          {(function() {
-                            switch (item.bg.condition) {
-                              case "Excellent":
-                                return (
-                                  <span className="badge badge-success float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              case "Good":
-                                return (
-                                  <span className="badge badge-primary float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              case "Fair":
-                                return (
-                                  <span className="badge badge-warning float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              case "Poor":
-                                return (
-                                  <span className="badge badge-danger float-right">
-                                    {item.bg.condition}
-                                  </span>
-                                );
-                              default:
-                                return null;
-                            }
-                          })()}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="row">
-            <FormGroup className="col-6">
-              <Label for="notes">Notes</Label>
-              <Input
-                type="textarea"
-                maxLength="500"
-                style={{ resize: "none", width: "400" }}
-                rows="5"
-                name="notes"
-                id="tradeNotes"
-                placeholder="500 characters max."
-              />
-            </FormGroup>
-            <div className="offset-5 col-1">
-              <button
-                className="btn btn-success stickBottom"
-                onClick={this.submitTrade}
-              >
-                Confirm Trade
-                <br />
-                <FontAwesomeIcon
-                  size="lg"
-                  icon={faExchangeAlt}
-                ></FontAwesomeIcon>
-              </button>
-            </div>
-          </div>
-        </div>
-      </ReactModal>
+  const renderConditionBadge = (condition: string) => {
+    switch (condition) {
+      case "Excellent":
+        return (
+          <span className="badge badge-success float-right">
+            {condition}
+          </span>
+        );
+      case "Good":
+        return (
+          <span className="badge badge-primary float-right">
+            {condition}
+          </span>
+        );
+      case "Fair":
+        return (
+          <span className="badge badge-warning float-right">
+            {condition}
+          </span>
+        );
+      case "Poor":
+        return (
+          <span className="badge badge-danger float-right">
+            {condition}
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (redirect) {
+    return (
+      <Navigate
+        to={redirect}
+        state={{ tradeId }}
+      />
     );
   }
-}
+
+  return (
+    <ReactModal
+      isOpen={show}
+      style={style}
+      onRequestClose={handleClose}
+    >
+      <div className="container-fluid">
+        <div>
+          <h1>
+            Confirm Request
+            <button
+              type="button"
+              className="close float-right"
+              onClick={handleClose}
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </h1>
+        </div>
+        <div className="row">
+          <div className="col-6">
+            <h3>You</h3>
+            <table className="table table-bordered">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tradeData.userTradeList?.map(item => {
+                  return (
+                    <tr key={item.id}>
+                      <td>
+                        {item.bg.boardgame.title}{" "}
+                        {renderConditionBadge(item.bg.condition)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="col-6">
+            <h3>{tradeData.searchedUser}</h3>
+            <table className="table table-bordered">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tradeData.searchedUserTradeList?.map(item => {
+                  return (
+                    <tr key={item.id}>
+                      <td>
+                        {item.bg.boardgame.title}{" "}
+                        {renderConditionBadge(item.bg.condition)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="row">
+          <FormGroup className="col-6">
+            <Label htmlFor="notes">Notes</Label>
+            <Input
+              type="textarea"
+              maxLength="500"
+              style={{ resize: "none", width: "400" }}
+              rows="5"
+              name="notes"
+              id="tradeNotes"
+              placeholder="500 characters max."
+            />
+          </FormGroup>
+          <div className="offset-5 col-1">
+            <button
+              className="btn btn-success stickBottom"
+              onClick={submitTrade}
+            >
+              Confirm Trade
+              <br />
+              <FontAwesomeIcon
+                size="lg"
+                icon={faExchangeAlt}
+              ></FontAwesomeIcon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </ReactModal>
+  );
+};
+
+export default ConfirmRequestModal;

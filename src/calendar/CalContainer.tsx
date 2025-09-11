@@ -1,70 +1,71 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
 import "./calStyle.css";
 
 import SideBar from "./CalSideBar";
 import Calendar from "./Calendar";
 import { getEventsByUserId } from "./apiCalendar";
 import { isAuthenticated } from "../auth";
-import { EventContext } from "../context/EventContext";
+import { EventProvider, useEvents } from "../context/EventContext";
 
 //import Animator from "../animator/Animator";
 
-const CalContainer = (props) => {
-  const userId = props.match.params.userId;
+// Inner component that uses the EventContext
+const CalendarContent: React.FC<{ userId: string }> = ({ userId }) => {
+  const { setEvents } = useEvents();
   const [redirectTo, setRedirectTo] = useState(false);
-  const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState({
-    _id: "",
-    title: "",
-    allDay: false,
-    description: "",
-    startDate: new Date(),
-    endDate: new Date(),
-    owner: isAuthenticated().user._id,
-    bgColor: "eventTag-Blue",
-    boardgames: [],
-    tempBoardgame: "",
-  });
-
-  const eventValues = useMemo(
-    () => ({ events, setEvents, selectedEvent, setSelectedEvent }),
-    [events, selectedEvent]
-  );
 
   useEffect(() => {
-    getEventsByUserId(userId, isAuthenticated().token).then((data) => {
-      if (data.error) {
-        setRedirectTo(true);
-      } else {
-        setEvents(data);
-      }
-    });
-  }, [userId]);
+    if (userId) {
+      getEventsByUserId(userId, isAuthenticated().token).then((data) => {
+        if (data.error) {
+          setRedirectTo(true);
+        } else {
+          setEvents(data);
+        }
+      });
+    }
+  }, [userId, setEvents]);
+
+  if (redirectTo) {
+    return <Navigate to={`/404`} />;
+  }
 
   return (
-    <>
-      {redirectTo ? (
-        <Navigate to={`/404`} />
-      ) : (
-        <EventContext.Provider value={eventValues}>
-          <div className="container-fluid calContainer">
-            <div className="row">
-              <div className="col-12">
-                <div className="card">
-                  <div className="card-body">
-                    <div className="row">
-                      <SideBar userId={userId} />
-                      <Calendar userId={userId} />
-                    </div>
-                  </div>
-                </div>
+    <div className="container-fluid calContainer">
+      <div className="row">
+        <div className="col-12">
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <SideBar userId={userId} />
+                <Calendar userId={userId} />
               </div>
             </div>
           </div>
-        </EventContext.Provider>
-      )}
-    </>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CalContainer: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+
+  // Initialize the selected event with proper owner ID
+  const initialSelectedEvent = {
+    owner: isAuthenticated().user._id,
+    bgColor: "eventTag-Blue",
+  };
+
+  if (!userId) {
+    return <Navigate to={`/404`} />;
+  }
+
+  return (
+    <EventProvider initialSelectedEvent={initialSelectedEvent}>
+      <CalendarContent userId={userId} />
+    </EventProvider>
   );
 };
 

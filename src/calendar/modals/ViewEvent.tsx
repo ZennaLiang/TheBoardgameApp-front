@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,11 +8,11 @@ import {
   faClipboard,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { EventContext } from "../../context/EventContext";
+import { useEvents } from "../../context/EventContext";
 import { isAuthenticated } from "../../auth";
 
-const ViewEvent = (props) => {
-  const { selectedEvent } = useContext(EventContext);
+const ViewEvent: React.FC = () => {
+  const { selectedEvent } = useEvents();
 
   const formatingDate = () => {
     let formatDate = selectedEvent.allDay ? (
@@ -31,7 +31,7 @@ const ViewEvent = (props) => {
       <div
         className="modal fade"
         id="viewEventModal"
-        tabIndex="-1"
+        tabIndex={-1}
         role="dialog"
         aria-labelledby="eventViewModalLabel"
         aria-hidden="true"
@@ -105,13 +105,17 @@ const ViewEvent = (props) => {
                     <span className="fa fa-address-book"></span>
                   </div>
                   <div className="col-11 text-wrap text-left">
-                    {selectedEvent.owner.name}
+                    {typeof selectedEvent.owner === 'string' 
+                      ? selectedEvent.owner 
+                      : selectedEvent.owner.name}
                   </div>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
-              {isAuthenticated().user._id === selectedEvent.owner._id && (
+              {isAuthenticated().user._id === (typeof selectedEvent.owner === 'string' 
+                ? selectedEvent.owner 
+                : selectedEvent.owner._id) && (
                 <button
                   type="button"
                   data-dismiss="modal"

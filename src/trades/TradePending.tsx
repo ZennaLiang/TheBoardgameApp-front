@@ -1,24 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { isAuthenticated } from "../auth";
 import Helpers from "../helpers";
 
-class TradePending extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      redirectToHome: false
-    };
-  }
+interface TradePendingProps {
+  userId?: string;
+  trades: any[];
+  onClickComplete: (tradeId: string) => void;
+}
 
-  componentDidMount() {
+const TradePending: React.FC<TradePendingProps> = ({
+  userId,
+  trades,
+  onClickComplete
+}) => {
+  const [redirectToHome, setRedirectToHome] = useState(false);
+
+  useEffect(() => {
     if (
-      isAuthenticated()._id !== this.props.userId &&
+      isAuthenticated()._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
-      this.setState({ redirectToHome: true });
+      setRedirectToHome(true);
     }
-  }
-  badgeBgRender = condition => {
+  }, [userId]);
+
+  const badgeBgRender = (condition: string) => {
     switch (condition) {
       case "Excellent":
         return "badge-success";
@@ -32,12 +38,12 @@ class TradePending extends React.Component {
         return null;
     }
   };
-  render() {
-    return (
+
+  return (
       <div className="card">
         <div className="card-header font-weight-bold">Pending Trade</div>
         <div className="card-body">
-          {this.props.trades.map(trade => {
+          {trades.map(trade => {
             return (
               <div className="row" key={trade._id}>
                 <img
@@ -62,7 +68,7 @@ class TradePending extends React.Component {
                     <button
                       type="button"
                       className="btn btn-success mx-2 my-3"
-                      onClick={() => this.props.onClickComplete(trade._id)}
+                      onClick={() => onClickComplete(trade._id)}
                     >
                       Complete
                     </button>
@@ -83,7 +89,7 @@ class TradePending extends React.Component {
                         <p key={game._id}>
                           {game.name}{" "}
                           <span
-                            className={`badge ${this.badgeBgRender(
+                            className={`badge ${badgeBgRender(
                               game.condition
                             )} float-right mt-1`}
                           >
@@ -98,7 +104,7 @@ class TradePending extends React.Component {
                         <p key={game._id}>
                           {game.name}{" "}
                           <span
-                            className={`badge ${this.badgeBgRender(
+                            className={`badge ${badgeBgRender(
                               game.condition
                             )} float-right mt-1`}
                           >
@@ -123,6 +129,6 @@ class TradePending extends React.Component {
         </div>
       </div>
     );
-  }
-}
+};
+
 export default TradePending;

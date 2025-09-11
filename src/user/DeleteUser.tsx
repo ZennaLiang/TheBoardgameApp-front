@@ -1,18 +1,19 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { isAuthenticated } from "../auth";
 import { removeUser } from "./apiUser";
 import { signout } from "../auth";
 
-class DeleteUser extends Component {
-    state = {
-        redirect: false
-    };
+interface DeleteUserProps {
+    userId: string;
+}
 
-    deleteAccount = () => {
+const DeleteUser: React.FC<DeleteUserProps> = ({ userId }) => {
+    const [redirect, setRedirect] = useState(false);
+
+    const deleteAccount = () => {
         const token = isAuthenticated().token;
-        const userId = this.props.userId;
         removeUser(userId, token).then(data => {
             if (data.error) {
                 console.log(data.error);
@@ -23,33 +24,32 @@ class DeleteUser extends Component {
                     signout(() => console.log("User is deleted"));
                 }
                 // redirect
-                this.setState({ redirect: true });
+                setRedirect(true);
             }
         });
     };
 
-    deleteConfirmed = () => {
+    const deleteConfirmed = () => {
         let answer = window.confirm(
             "Are you sure you want to delete your account?"
         );
         if (answer) {
-            this.deleteAccount();
+            deleteAccount();
         }
     };
 
-    render() {
-        if (this.state.redirect) {
-            return <Navigate to="/" />;
-        }
-        return (
-            <button
-                onClick={this.deleteConfirmed}
-                className="btn btn-danger"
-            >
-                Delete Profile
-            </button>
-        );
+    if (redirect) {
+        return <Navigate to="/" />;
     }
-}
+
+    return (
+        <button
+            onClick={deleteConfirmed}
+            className="btn btn-danger"
+        >
+            Delete Profile
+        </button>
+    );
+};
 
 export default DeleteUser;

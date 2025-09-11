@@ -1,48 +1,44 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import Posts from "../post/Posts";
 import Users from "../user/Users";
 import { isAuthenticated } from "../auth";
 import { Navigate } from "react-router-dom";
 
-class Admin extends Component {
-    state = {
-        redirectToHome: false
-    };
+const Admin: React.FC = () => {
+    const [redirectToHome, setRedirectToHome] = useState(false);
 
-    componentDidMount() {
+    useEffect(() => {
         if (isAuthenticated().user.role !== "admin") {
-            this.setState({ redirectToHome: true });
+            setRedirectToHome(true);
         }
+    }, []);
+
+    if (redirectToHome) {
+        return <Navigate to="/" />;
     }
 
-    render() {
-        if (this.state.redirectToHome) {
-            return <Navigate to="/" />;
-        }
-
-        return (
-            <div>
-                <div className="jumbotron">
-                    <h2>Admin Dashboard</h2>
-                    <p className="lead">Welcome to React Frontend</p>
-                </div>
-                <div className="container-fluid">
-                    <div className="row">
-                        <div className="col-md-6">
-                            <h2>Posts</h2>
-                            <hr />
-                            <Posts />
-                        </div>
-                        <div className="col-md-6">
-                            <h2>Users</h2>
-                            <hr />
-                            <Users />
-                        </div>
+    return (
+        <div>
+            <div className="jumbotron">
+                <h2>Admin Dashboard</h2>
+                <p className="lead">Welcome to React Frontend</p>
+            </div>
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-md-6">
+                        <h2>Posts</h2>
+                        <hr />
+                        <Posts />
+                    </div>
+                    <div className="col-md-6">
+                        <h2>Users</h2>
+                        <hr />
+                        <Users />
                     </div>
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
 export default Admin;

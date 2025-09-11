@@ -92,7 +92,7 @@ const Table = ({ columns, data }: { columns: any[]; data: any[] }) => {
   );
 
   const defaultColumn = React.useMemo(
-    () => ({
+    (): any => ({
       Filter: DefaultColumnFilter,
     }),
     []
@@ -123,10 +123,10 @@ const Table = ({ columns, data }: { columns: any[]; data: any[] }) => {
         pageIndex: 0,
         hiddenColumns: ["minPlayers"],
       },
-    },
+    } as any,
     useFilters,
     usePagination
-  );
+  ) as any;
 
   return (
     <>
@@ -150,7 +150,7 @@ const Table = ({ columns, data }: { columns: any[]; data: any[] }) => {
         <tbody {...getTableBodyProps()}>
           {page.length === 0 ? (
             <tr>
-              <td colSpan="5" className="align-middle">
+              <td colSpan={5} className="align-middle">
                 No data
               </td>
             </tr>
@@ -320,7 +320,7 @@ const BggCollection = () => {
         className: "d-none d-sm-table-cell",
         accessor: "avgRating",
         Cell: ({ cell: { value } }) => (
-          <span>{Math.round(10 * String(value)) / 10}</span>
+          <span>{Math.round(10 * Number(value)) / 10}</span>
         ),
         Filter: NumberSelectFilter,
         filter: filterGreaterThan,
@@ -419,10 +419,10 @@ const BggCollection = () => {
         height={40}
         width={40}
         color="#4fa94d"
-        visible={true}
+        visible={isLoading}
         ariaLabel="oval-loading"
-      >
-        <BgContainer sidebar="BggCollection">
+      />
+      <BgContainer sidebar="BggCollection">
           <div className="container-fluid">
             <div className="row justify-content-center text-center my-2">
               <h2 className="header-font">BGG Collection Viewer</h2>
@@ -465,8 +465,7 @@ const BggCollection = () => {
               <Table columns={columns} data={data} />
             </div>
           </div>
-        </BgContainer>
-      </Oval>
+      </BgContainer>
     </>
   );
 };

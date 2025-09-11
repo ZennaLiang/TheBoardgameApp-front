@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 // import GoogleLogin from "react-google-login";
 // import FacebookLogin from "react-facebook-login";
@@ -7,10 +7,6 @@ import { googleLogin, facebookLogin, authenticate } from "../auth";
 
 interface SocialLoginsProps {
   title: string;
-}
-
-interface SocialLoginsState {
-  redirectToReferrer: boolean;
 }
 
 /* Need google oAuth clientID for google login
@@ -34,15 +30,10 @@ interface SocialLoginsState {
 3. Go to Settings -> Basic on left sidebar
     - App Domains - localhost   
  */
-class SocialLogins extends Component<SocialLoginsProps, SocialLoginsState> {
-  constructor(props: SocialLoginsProps) {
-    super(props);
-    this.state = {
-      redirectToReferrer: false,
-    };
-  }
+const SocialLogins: React.FC<SocialLoginsProps> = ({ title }) => {
+  const [redirectToReferrer, setRedirectToReferrer] = useState<boolean>(false);
 
-  responseGoogle = (response: any) => {
+  const responseGoogle = (response: any) => {
     //console.log(response);
     const tokenId = response.tokenId;
     const user = {
@@ -54,13 +45,13 @@ class SocialLogins extends Component<SocialLoginsProps, SocialLoginsState> {
         console.log("Error Login. Please try again..");
       } else {
         authenticate(data, () => {
-          this.setState({ redirectToReferrer: true });
+          setRedirectToReferrer(true);
         });
       }
     });
   };
 
-  responseFacebook = (response: any) => {
+  const responseFacebook = (response: any) => {
     const { id, name, email, picture } = response;
     const user = {
       password: id,
@@ -73,26 +64,23 @@ class SocialLogins extends Component<SocialLoginsProps, SocialLoginsState> {
         console.log("Error Login. Please try again..");
       } else {
         authenticate(data, () => {
-          this.setState({ redirectToReferrer: true });
+          setRedirectToReferrer(true);
         });
       }
     });
   };
 
-  render() {
-    // redirect
-    const { redirectToReferrer } = this.state;
+  // redirect
+  if (redirectToReferrer) {
+    return <Navigate to="/posts" />;
+  }
 
-    if (redirectToReferrer) {
-      return <Navigate to="/posts" />;
-    }
-
-    return (
+  return (
       <div className="text-center social-btn">
         {/* <GoogleLogin
           clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-          onSuccess={this.responseGoogle}
-          onFailure={this.responseGoogle}
+          onSuccess={responseGoogle}
+          onFailure={responseGoogle}
           cookiePolicy={"single_host_origin"}
           icon={false}
           render={(renderProps) => (
@@ -102,7 +90,7 @@ class SocialLogins extends Component<SocialLoginsProps, SocialLoginsState> {
               disabled={renderProps.disabled}
             >
               <i className="fab fa-google" style={{ marginLeft: "5px" }} />
-              <span>{this.props.title} with Google</span>
+              <span>{title} with Google</span>
             </button>
           )}
         />
@@ -110,18 +98,17 @@ class SocialLogins extends Component<SocialLoginsProps, SocialLoginsState> {
         <FacebookLogin
           appId={process.env.REACT_APP_FACEBOOK_APP_ID}
           fields="id,name,email,picture"
-          callback={this.responseFacebook}
+          callback={responseFacebook}
           autoLoad={false}
           reauthenticate={true}
           cssClass="btn btn-primary btn-block"
           icon={
             <i className="fab fa-facebook" style={{ marginLeft: "5px" }}></i>
           }
-          textButton={this.props.title + " with Facebook"}
+          textButton={title + " with Facebook"}
         /> */}
       </div>
     );
-  }
-}
+};
 
 export default SocialLogins;

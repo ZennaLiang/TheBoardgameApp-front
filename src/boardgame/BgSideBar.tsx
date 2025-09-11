@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { isAuthenticated } from "../auth";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import { getUser } from "../user/apiUser";
 
@@ -9,70 +9,53 @@ interface BgSideBarProps {
   userId: string;
 }
 
-interface BgSideBarState {
-  name: string;
-  loading: boolean;
-  file: any;
-}
+const BgSideBar: React.FC<BgSideBarProps> = ({ highlight, userId }) => {
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-class BgSideBar extends React.Component<BgSideBarProps, BgSideBarState> {
-  constructor(props: BgSideBarProps) {
-    super(props);
-    this.state = {
-      name: "",
-      loading: false,
-      file: null,
+  useEffect(() => {
+    const init = (userIdToInit: string) => {
+      const token = isAuthenticated().token;
+      getUser(userIdToInit, token).then((data) => {
+        if (data.error) {
+          console.log(data.error);
+        } else {
+          setName(data.name);
+        }
+      });
     };
-  }
-  init = (userId: string) => {
-    const token = isAuthenticated().token;
-    getUser(userId, token).then((data) => {
-      if (data.error) {
-        this.setState({ redirectToProfile: true });
-      } else {
-        this.setState({
-          name: data.name,
-        });
-      }
-    });
-  };
 
-  componentDidMount() {
-    let userId = isAuthenticated().user._id;
-    this.init(userId);
-  }
+    const currentUserId = isAuthenticated().user._id;
+    init(currentUserId);
+  }, []);
 
-  render() {
-    return (
-      <>
-        <div
-          className="col-md-2 col-lg-2 col-xl-2 maxSidebarWidth pl-0 justify-content-right mt-5 pt-4 d-none d-lg-block"
-          highlight={this.props.highlight}
-        >
-          <div className="list-group ">
-            <span className="list-group-item list-group-item-dark font-weight-bold">
-              Collections
-            </span>
-            <Link
-              className={`list-group-item list-group-item-action ${
-                this.props.highlight === "UserCollection" ? "active" : ""
-              }`}
-              to={`/collection/bgguru`}
-            >
-              Guru Collection <span className="sr-only">(current)</span>
-            </Link>
-            <Link
-              className={`list-group-item list-group-item-action ${
-                this.props.highlight === "BggCollection" ? "active" : ""
-              }`}
-              to={`/collection/bgg`}
-            >
-              BGG Collection
-            </Link>
-          </div>
+  return (
+    <>
+      <div className="col-md-2 col-lg-2 col-xl-2 maxSidebarWidth pl-0 justify-content-right mt-5 pt-4 d-none d-lg-block">
+        <div className="list-group ">
+          <span className="list-group-item list-group-item-dark font-weight-bold">
+            Collections
+          </span>
+          <Link
+            className={`list-group-item list-group-item-action ${
+              highlight === "UserCollection" ? "active" : ""
+            }`}
+            to={`/collection/bgguru`}
+          >
+            Guru Collection <span className="sr-only">(current)</span>
+          </Link>
+          <Link
+            className={`list-group-item list-group-item-action ${
+              highlight === "BggCollection" ? "active" : ""
+            }`}
+            to={`/collection/bgg`}
+          >
+            BGG Collection
+          </Link>
         </div>
-      </>
-    );
-  }
-}
+      </div>
+    </>
+  );
+};
+
 export default BgSideBar;

@@ -1,105 +1,106 @@
-import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Navigate, useParams } from "react-router-dom";
 
 import { getPost, updatePost } from "./apiPost";
 import { isAuthenticated } from "../auth";
 import DefaultPostImg from "../images/defaultPostImg.jpg";
 
-class EditPost extends Component {
-  constructor() {
-    super();
-    this.state = {
-      id: "",
-      title: "",
-      body: "",
-      redirectToProfile: false,
-      error: "",
-      fileSize: 0,
-      loading: false,
-    };
-  }
+const EditPost: React.FC = () => {
+  const [id, setId] = useState("");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [redirectToProfile, setRedirectToProfile] = useState(false);
+  const [error, setError] = useState("");
+  const [fileSize, setFileSize] = useState(0);
+  const [loading, setLoading] = useState(false);
+  
+  const { postId } = useParams<{ postId: string }>();
+  const postDataRef = useRef<FormData>(new FormData());
 
-  init = (postId) => {
+  const init = (postId: string) => {
     getPost(postId).then((data) => {
       if (data.error) {
-        this.setState({ redirectToProfile: true });
+        setRedirectToProfile(true);
       } else {
-        this.setState({
-          id: data._id,
-          title: data.title,
-          body: data.body,
-          error: "",
-        });
+        setId(data._id);
+        setTitle(data.title);
+        setBody(data.body);
+        setError("");
       }
     });
   };
 
-  componentDidMount() {
-    this.postData = new FormData();
-    const postId = this.props.match.params.postId;
-    this.init(postId);
-  }
+  useEffect(() => {
+    if (postId) {
+      init(postId);
+    }
+  }, [postId]);
 
-  isValid = () => {
-    const { title, body, fileSize } = this.state;
+  const isValid = () => {
     if (fileSize > 100000) {
-      this.setState({
-        error: "File size should be less than 100kb",
-        loading: false,
-      });
+      setError("File size should be less than 100kb");
+      setLoading(false);
       return false;
     }
     if (title.length === 0 || body.length === 0) {
-      this.setState({ error: "All fields are required", loading: false });
+      setError("All fields are required");
+      setLoading(false);
       return false;
     }
     if (title.length > 60) {
-      this.setState({
-        error: "Title is limited to 60 characters",
-        loading: false,
-      });
+      setError("Title is limited to 60 characters");
+      setLoading(false);
       return false;
     }
     return true;
   };
 
-  handleChange = (name) => (event) => {
-    this.setState({ error: "" });
-    const value = name === "photo" ? event.target.files[0] : event.target.value;
+  const handleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setError("");
+    const target = event.target as HTMLInputElement;
+    const value = name === "photo" ? target.files?.[0] : target.value;
 
-    const fileSize = name === "photo" ? event.target.files[0].size : 0;
-    this.postData.set(name, value);
-    this.setState({ [name]: value, fileSize });
+    const newFileSize = name === "photo" && target.files?.[0] ? target.files[0].size : 0;
+    if (value !== undefined) {
+      postDataRef.current.set(name, value as string | File);
+    }
+    
+    if (name === "title") {
+      setTitle(value as string);
+    } else if (name === "body") {
+      setBody(value as string);
+    }
+    
+    setFileSize(newFileSize);
   };
 
-  clickSubmit = (event) => {
+  const clickSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    this.setState({ loading: true });
+    setLoading(true);
 
-    if (this.isValid()) {
-      const postId = this.props.match.params.postId;
+    if (isValid() && postId) {
       const token = isAuthenticated().token;
 
-      updatePost(postId, token, this.postData).then((data) => {
-        if (data.error) this.setState({ error: data.error });
-        else {
-          this.setState({
-            loading: false,
-            title: "",
-            body: "",
-            redirectToProfile: true,
-          });
+      updatePost(postId, token, postDataRef.current).then((data) => {
+        if (data.error) {
+          setError(data.error);
+          setLoading(false);
+        } else {
+          setLoading(false);
+          setTitle("");
+          setBody("");
+          setRedirectToProfile(true);
         }
       });
     }
   };
 
-  editPostForm = (title, body) => (
+  const editPostForm = (
     <form>
       <div className="form-group">
         <label className="text-muted">Post Photo</label>
         <input
-          onChange={this.handleChange("photo")}
+          onChange={handleChange("photo")}
           type="file"
           accept="image/*"
           className="form-control"
@@ -108,7 +109,7 @@ class EditPost extends Component {
       <div className="form-group">
         <label className="text-muted">Title</label>
         <input
-          onChange={this.handleChange("title")}
+          onChange={handleChange("title")}
           type="text"
           className="form-control"
           value={title}
@@ -118,58 +119,53 @@ class EditPost extends Component {
       <div className="form-group">
         <label className="text-muted">Body</label>
         <textarea
-          onChange={this.handleChange("body")}
-          type="text"
+          onChange={handleChange("body")}
           className="form-control"
           value={body}
         />
       </div>
 
-      <button onClick={this.clickSubmit} className="btn btn-raised btn-primary">
+      <button onClick={clickSubmit} className="btn btn-raised btn-primary">
         Update Post
       </button>
     </form>
   );
 
-  render() {
-    const { id, title, body, redirectToProfile, error, loading } = this.state;
-
-    if (redirectToProfile) {
-      return <Navigate to={`/user/${isAuthenticated().user._id}`} />;
-    }
-
-    return (
-      <div className="container">
-        <h2 className="mt-5 mb-5">{title}</h2>
-
-        <div
-          className="alert alert-danger"
-          style={{ display: error ? "" : "none" }}
-        >
-          {error}
-        </div>
-
-        {loading ? (
-          <div className="jumbotron text-center">
-            <h2>Loading...</h2>
-          </div>
-        ) : (
-          ""
-        )}
-        <img
-          style={{ height: "200px", width: "auto" }}
-          className="img-thumbnail"
-          src={`${
-            process.env.REACT_APP_API_URL
-          }/post/photo/${id}?${new Date().getTime()}`}
-          onError={(i) => (i.target.src = `${DefaultPostImg}`)}
-          alt={title}
-        />
-
-        {this.editPostForm(title, body)}
-      </div>
-    );
+  if (redirectToProfile) {
+    return <Navigate to={`/user/${isAuthenticated().user._id}`} />;
   }
-}
+
+  return (
+    <div className="container">
+      <h2 className="mt-5 mb-5">{title}</h2>
+
+      <div
+        className="alert alert-danger"
+        style={{ display: error ? "" : "none" }}
+      >
+        {error}
+      </div>
+
+      {loading ? (
+        <div className="jumbotron text-center">
+          <h2>Loading...</h2>
+        </div>
+      ) : (
+        ""
+      )}
+      <img
+        style={{ height: "200px", width: "auto" }}
+        className="img-thumbnail"
+        src={`${
+          process.env.REACT_APP_API_URL
+        }/post/photo/${id}?${new Date().getTime()}`}
+        onError={(i) => (i.target.src = `${DefaultPostImg}`)}
+        alt={title}
+      />
+
+      {editPostForm}
+    </div>
+  );
+};
 
 export default EditPost;

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Link, Navigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, Navigate, useParams } from "react-router-dom";
 
 import { getPost, removePost, likePost, unlikePost } from "./apiPost";
 import DefaultPostImg from "../images/defaultPostImg.jpg";
@@ -21,230 +21,208 @@ interface PostData {
   createdDate: string;
 }
 
-interface PostProps {
-  match: {
-    params: {
-      postId: string;
-    };
-  };
-}
+interface PostProps {}
 
-interface PostState {
-  post: PostData | string;
-  redirectToPosts: boolean;
-  redirectToSignin: boolean;
-  like: boolean;
-  likes: number;
-  comments: any[];
-}
+const Post: React.FC<PostProps> = () => {
+  const { postId } = useParams<{ postId: string }>();
+  const [post, setPost] = useState<PostData | string>("");
+  const [redirectToPosts, setRedirectToPosts] = useState(false);
+  const [redirectToSignin, setRedirectToSignin] = useState(false);
+  const [like, setLike] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [comments, setComments] = useState<any[]>([]);
 
-class Post extends Component<PostProps, PostState> {
-    state = {
-        post: "",
-        redirectToPosts: false,
-        redirectToSignin: false,
-        like: false,
-        likes: 0, // total likes
-        comments: []
-    };
+  const isLiked = useCallback((likes: string[]) => {
+    const userId = isAuthenticated() && isAuthenticated().user._id;
+    return likes.indexOf(userId) !== -1;
+  }, []);
 
-    componentDidMount = () => {
-        const postId = this.props.match.params.postId;
-        getPost(postId).then(data => {
-            if (data.error) {
-                console.log(data.error);
-            } else {
-                this.setState({
-                    post: data,
-                    likes: data.likes.length,
-                    like: this.isLiked(data.likes),
-                    comments: data.comments
-                });
-            }
-        });
-    };
-
-    isLiked = (likes: string[]) => {
-        const userId = isAuthenticated() && isAuthenticated().user._id;
-        let match = likes.indexOf(userId) !== -1;
-        return match;
-    };
-
-    likeToggle = () => {
-        if (!isAuthenticated()) {
-            this.setState({ redirectToSignin: true });
-            return false;
+  useEffect(() => {
+    if (postId) {
+      getPost(postId).then(data => {
+        if (data.error) {
+          console.log(data.error);
+        } else {
+          setPost(data);
+          setLikes(data.likes.length);
+          setLike(isLiked(data.likes));
+          setComments(data.comments);
         }
-        let callApi = this.state.like ? unlikePost : likePost;
-        const userId = isAuthenticated().user._id;
-        const postId = this.state.post._id;
-        const token = isAuthenticated().token;
-
-        callApi(userId, token, postId).then(data => {
-            if (data.error) {
-                console.log(data.error);
-            } else {
-                this.setState({
-                    like: !this.state.like, // true = false vice versa for toggle
-                    likes: data.likes.length
-                });
-            }
-        });
-    };
-
-    deletePost = () => {
-        const postId = this.props.match.params.postId;
-        const token = isAuthenticated().token;
-        removePost(postId, token).then(data => {
-            if (data.error) {
-                console.log(data.error);
-            } else {
-                this.setState({ redirectToPosts: true });
-            }
-        });
-    };
-
-    deleteConfirmed = () => {
-        let answer = window.confirm(
-            "Are you sure you want to delete your post?"
-        );
-        if (answer) {
-            this.deletePost();
-        }
-    };
-
-    updateComments = (comments: any[]) => {
-        this.setState({ comments });
-    };
-
-    renderPost = (post: PostData) => {
-        const posterId = post.postedBy ? `/user/${post.postedBy._id}` : "";
-        const posterName = post.postedBy ? post.postedBy.name : " Unknown";
-
-        const { like, likes } = this.state;
-
-        return (
-            <div className="card-body">
-                <img
-                    src={`${process.env.REACT_APP_API_URL}/post/photo/${post._id}`}
-                    alt={post.title}
-                    onError={i => (i.target.src = `${DefaultPostImg}`)}
-                    className="img-thunbnail mb-3"
-                    style={{ height: "300px", width: "100%", objectFit: "cover" }}
-                />
-
-                {like ? (
-                    <h3 onClick={this.likeToggle}>
-                        <i
-                            className="fa fa-thumbs-up text-success bg-dark"
-                            style={{ padding: "10px", borderRadius: "50%" }}
-                        />{" "}
-                        {likes} Like
-                    </h3>
-                ) : (
-                        <h3 onClick={this.likeToggle}>
-                            <i
-                                className="fa fa-thumbs-up text-warning bg-dark"
-                                style={{ padding: "10px", borderRadius: "50%" }}
-                            />{" "}
-                            {likes} Like
-                    </h3>
-                    )}
-
-                <p className="card-text">{post.body}</p>
-                <br />
-                <p className="font-italic mark">
-                    Posted by <Link to={`${posterId}`}>{posterName} </Link>
-                    on {new Date(post.createdDate).toDateString()}
-                </p>
-                <div className="d-inline-block">
-                    <Link
-                        to={`/posts`}
-                        className="btn btn-raised btn-primary btn-sm mr-5"
-                    >
-                        Back to posts
-                    </Link>
-
-                    {isAuthenticated().user &&
-                        isAuthenticated().user._id === post.postedBy._id && (
-                            <>
-                                <Link
-                                    to={`/post/edit/${post._id}`}
-                                    className="btn btn-raised btn-warning btn-sm mr-5"
-                                >
-                                    Update Post
-                                </Link>
-                                <button
-                                    onClick={this.deleteConfirmed}
-                                    className="btn btn-raised btn-danger"
-                                >
-                                    Delete Post
-                                </button>
-                            </>
-                        )}
-                    <div>
-                        {isAuthenticated().user &&
-                            isAuthenticated().user.role === "admin" && (
-                                <div className="card mt-5">
-                                    <div className="card-body">
-                                        <h5 className="card-title">Admin</h5>
-                                        <p className="mb-2 text-danger">
-                                            Edit/Delete as an Admin
-                                        </p>
-                                        <Link
-                                            to={`/post/edit/${post._id}`}
-                                            className="btn btn-raised btn-warning btn-sm mr-5"
-                                        >
-                                            Update Post
-                                        </Link>
-                                        <button
-                                            onClick={this.deleteConfirmed}
-                                            className="btn btn-raised btn-danger"
-                                        >
-                                            Delete Post
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    render() {
-        const { post, redirectToPosts, redirectToSignin, comments } = this.state;
-
-        if (redirectToPosts) {
-            return <Navigate to={`/posts`} />;
-        } else if (redirectToSignin) {
-            return <Navigate to={`/signin`} />;
-        }
-
-        const postData = post as PostData;
-
-        return (
-            <div className="container">
-                <h2 className="display-2 mt-5 mb-5">{typeof post === 'string' ? '' : postData.title}</h2>
-
-                {typeof post === 'string' || !post ? (
-                    <div className="jumbotron text-center">
-                        <h2>Loading...</h2>
-                    </div>
-                ) : (
-                    this.renderPost(postData)
-                )}
-
-                {typeof post !== 'string' && post && (
-                    <PostComments
-                        postId={postData._id}
-                        comments={comments.reverse()}
-                        updateComments={this.updateComments}
-                    />
-                )}
-            </div>
-        );
+      });
     }
-}
+  }, [postId, isLiked]);
+
+
+  const likeToggle = useCallback(() => {
+    if (!isAuthenticated()) {
+      setRedirectToSignin(true);
+      return false;
+    }
+    
+    const callApi = like ? unlikePost : likePost;
+    const userId = isAuthenticated().user._id;
+    const currentPost = post as PostData;
+    const currentPostId = currentPost._id;
+    const token = isAuthenticated().token;
+
+    callApi(userId, token, currentPostId).then(data => {
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        setLike(!like); // toggle like state
+        setLikes(data.likes.length);
+      }
+    });
+  }, [like, post]);
+
+  const deletePost = useCallback(() => {
+    if (postId) {
+      const token = isAuthenticated().token;
+      removePost(postId, token).then(data => {
+        if (data.error) {
+          console.log(data.error);
+        } else {
+          setRedirectToPosts(true);
+        }
+      });
+    }
+  }, [postId]);
+
+  const deleteConfirmed = useCallback(() => {
+    const answer = window.confirm(
+      "Are you sure you want to delete your post?"
+    );
+    if (answer) {
+      deletePost();
+    }
+  }, [deletePost]);
+
+  const updateComments = useCallback((commentsData: any[]) => {
+    setComments(commentsData);
+  }, []);
+
+  const renderPost = useCallback((postData: PostData) => {
+    const posterId = postData.postedBy ? `/user/${postData.postedBy._id}` : "";
+    const posterName = postData.postedBy ? postData.postedBy.name : " Unknown";
+
+    return (
+      <div className="card-body">
+        <img
+          src={`${process.env.REACT_APP_API_URL}/post/photo/${postData._id}`}
+          alt={postData.title}
+          onError={(i: any) => (i.target.src = `${DefaultPostImg}`)}
+          className="img-thunbnail mb-3"
+          style={{ height: "300px", width: "100%", objectFit: "cover" }}
+        />
+
+        {like ? (
+          <h3 onClick={likeToggle}>
+            <i
+              className="fa fa-thumbs-up text-success bg-dark"
+              style={{ padding: "10px", borderRadius: "50%" }}
+            />{" "}
+            {likes} Like
+          </h3>
+        ) : (
+          <h3 onClick={likeToggle}>
+            <i
+              className="fa fa-thumbs-up text-warning bg-dark"
+              style={{ padding: "10px", borderRadius: "50%" }}
+            />{" "}
+            {likes} Like
+          </h3>
+        )}
+
+        <p className="card-text">{postData.body}</p>
+        <br />
+        <p className="font-italic mark">
+          Posted by <Link to={`${posterId}`}>{posterName} </Link>
+          on {new Date(postData.createdDate).toDateString()}
+        </p>
+        <div className="d-inline-block">
+          <Link
+            to={`/posts`}
+            className="btn btn-raised btn-primary btn-sm mr-5"
+          >
+            Back to posts
+          </Link>
+
+          {isAuthenticated().user &&
+            isAuthenticated().user._id === postData.postedBy._id && (
+              <>
+                <Link
+                  to={`/post/edit/${postData._id}`}
+                  className="btn btn-raised btn-warning btn-sm mr-5"
+                >
+                  Update Post
+                </Link>
+                <button
+                  onClick={deleteConfirmed}
+                  className="btn btn-raised btn-danger"
+                >
+                  Delete Post
+                </button>
+              </>
+            )}
+          <div>
+            {isAuthenticated().user &&
+              isAuthenticated().user.role === "admin" && (
+                <div className="card mt-5">
+                  <div className="card-body">
+                    <h5 className="card-title">Admin</h5>
+                    <p className="mb-2 text-danger">
+                      Edit/Delete as an Admin
+                    </p>
+                    <Link
+                      to={`/post/edit/${postData._id}`}
+                      className="btn btn-raised btn-warning btn-sm mr-5"
+                    >
+                      Update Post
+                    </Link>
+                    <button
+                      onClick={deleteConfirmed}
+                      className="btn btn-raised btn-danger"
+                    >
+                      Delete Post
+                    </button>
+                  </div>
+                </div>
+              )}
+          </div>
+        </div>
+      </div>
+    );
+  }, [like, likes, likeToggle, deleteConfirmed]);
+
+  if (redirectToPosts) {
+    return <Navigate to={`/posts`} />;
+  } else if (redirectToSignin) {
+    return <Navigate to={`/signin`} />;
+  }
+
+  const postData = post as PostData;
+
+  return (
+    <div className="container">
+      <h2 className="display-2 mt-5 mb-5">{typeof post === 'string' ? '' : postData.title}</h2>
+
+      {typeof post === 'string' || !post ? (
+        <div className="jumbotron text-center">
+          <h2>Loading...</h2>
+        </div>
+      ) : (
+        renderPost(postData)
+      )}
+
+      {typeof post !== 'string' && post && (
+        <PostComments
+          postId={postData._id}
+          comments={[...comments].reverse()}
+          updateComments={updateComments}
+        />
+      )}
+    </div>
+  );
+};
 
 export default Post;

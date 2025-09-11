@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import * as Yup from "yup";
 import DatePicker from "react-datepicker";
 import { Formik, Form, Field, ErrorMessage, getIn } from "formik";
@@ -12,7 +12,7 @@ import Select, { components } from "react-select";
 
 import { createEvent, getEventsByUserId, updateEvent } from "../apiCalendar";
 import { isAuthenticated } from "../../auth";
-import { EventContext } from "../../context/EventContext";
+import { useEvents } from "../../context/EventContext";
 
 const EventInfoValidation = Yup.object().shape({
   title: Yup.string()
@@ -26,9 +26,16 @@ const EventInfoValidation = Yup.object().shape({
   ),
 });
 
-const EventForm = (props) => {
+interface EventFormProps {
+  modalId: string;
+  modalTitle: string;
+  eventInfo: any;
+  resetModal: () => void;
+}
+
+const EventForm: React.FC<EventFormProps> = (props) => {
   const { modalId, modalTitle, eventInfo, resetModal } = props;
-  const { events, setEvents, selectedEvent } = useContext(EventContext);
+  const { events, setEvents, selectedEvent } = useEvents();
 
   useEffect(() => {}, [selectedEvent, events]);
 
@@ -97,7 +104,7 @@ const EventForm = (props) => {
       <div
         className="modal fade"
         id={modalId}
-        tabIndex="-1"
+        tabIndex={-1}
         role="dialog"
         aria-labelledby="eventLabel"
         aria-hidden="true"
@@ -222,10 +229,11 @@ const EventForm = (props) => {
                                 <DatePicker
                                   timeIntervals={15}
                                   minTime={values.startDate}
-                                  maxTime={new Date(values.startDate).setHours(
-                                    23,
-                                    59
-                                  )}
+                                  maxTime={(() => {
+                                    const date = new Date(values.startDate);
+                                    date.setHours(23, 59);
+                                    return date;
+                                  })()}
                                   dateFormat="h:mm aa"
                                   showTimeSelect
                                   showTimeSelectOnly

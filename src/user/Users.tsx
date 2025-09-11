@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import { getUsers } from "./apiUser";
@@ -12,32 +12,21 @@ interface User {
   photo?: boolean;
 }
 
-interface UsersProps {}
+const Users: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
 
-interface UsersState {
-  users: User[];
-}
-
-class Users extends Component<UsersProps, UsersState> {
-  constructor(props: UsersProps) {
-    super(props);
-    this.state = {
-      users: [],
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     getUsers().then((data) => {
       if (data.error) {
         console.log(data.error);
       } else {
-        this.setState({ users: data });
+        setUsers(data);
         Animator.animate();
       }
     });
-  }
+  }, []);
 
-  renderUsers = (users: User[]) => (
+  const renderUsers = (users: User[]) => (
     <div className="row">
       {users.map((user, i) => (
         <div className="card col-md-4 animator">
@@ -67,16 +56,13 @@ class Users extends Component<UsersProps, UsersState> {
     </div>
   );
 
-  render() {
-    const { users } = this.state;
-    return (
-      <div className="container">
-        <h2 className="mt-5 mb-5">Users</h2>
+  return (
+    <div className="container">
+      <h2 className="mt-5 mb-5">Users</h2>
 
-        {this.renderUsers(users)}
-      </div>
-    );
-  }
-}
+      {renderUsers(users)}
+    </div>
+  );
+};
 
 export default Users;

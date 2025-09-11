@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Navigate, useParams } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage, getIn } from "formik";
 import * as Yup from "yup";
 
@@ -39,106 +39,101 @@ const UserInfoValidation = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], "password doesnt match"),
 });
 
-class SettingUser extends Component {
-  constructor() {
-    super();
-    this.state = {
-      user: {
-        id: "",
-        name: "",
-        email: "",
-        password: "",
-        matchPassword: "",
-        about: "",
-      },
-      redirectToProfile: false,
-      loading: false,
-      alertStatus: "",
-      alertMsg: "",
-      alertVisible: false,
-    };
-  }
+const SettingUser: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    email: "",
+    password: "",
+    matchPassword: "",
+    about: "",
+  });
+  const [redirectToProfile, setRedirectToProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [alertStatus, setAlertStatus] = useState("");
+  const [alertMsg, setAlertMsg] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
 
-  init = (userId) => {
-    const token = isAuthenticated().token;
-    getUser(userId, token).then((data) => {
-      if (data.error) {
-        this.setState({ redirectToProfile: true });
-      } else {
-        this.setState({
-          user: {
+
+  useEffect(() => {
+    if (!userId) return;
+    
+    if (
+      isAuthenticated().user._id !== userId &&
+      isAuthenticated().user.role !== "admin"
+    ) {
+      setRedirectToProfile(true);
+      return;
+    }
+
+    const init = async (userId: string) => {
+      const token = isAuthenticated().token;
+      try {
+        const data = await getUser(userId, token);
+        if (data.error) {
+          setRedirectToProfile(true);
+        } else {
+          setUser({
             id: data._id,
             name: data.name,
             email: data.email,
             about: data.about,
             password: "",
             matchPassword: "",
-          },
-        });
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        setRedirectToProfile(true);
       }
-    });
-  };
+    };
 
-  componentDidMount() {
-    this.userData = new FormData();
-    const userId = this.props.match.params.userId;
-    if (
-      isAuthenticated().user._id !== userId &&
-      isAuthenticated().user.role !== "admin"
-    ) {
-      this.setState({ redirectToProfile: true });
-    }
-    this.init(userId);
-  }
+    init(userId);
+  }, [userId]);
 
-  userProfileForm = () => (
+  const userProfileForm = () => (
     <Formik
       enableReinitialize={true}
-      initialValues={this.state.user}
+      initialValues={user}
       validationSchema={UserInfoValidation}
       onSubmit={(values, { setSubmitting }) => {
-        this.setState({ loading: true });
+        setLoading(true);
+        const userData = new FormData();
 
-        this.userData.append("name", values.name);
-        this.userData.append("email", values.email);
-        this.userData.append("about", values.about);
+        userData.append("name", values.name);
+        userData.append("email", values.email);
+        userData.append("about", values.about);
         if (values.password) {
-          this.userData.append("password", values.password);
+          userData.append("password", values.password);
         }
 
         setTimeout(() => {
-          const userId = this.props.match.params.userId;
+          if (!userId) return;
           const token = isAuthenticated().token;
 
-          updateUser(userId, token, this.userData).then((data) => {
+          updateUser(userId, token, userData).then((data) => {
             if (data.error) {
-              this.setState({
-                loading: false,
-                alertStatus: "danger",
-                alertMsg:
-                  "Unable to update information. Please try again later.",
-                alertVisible: true,
-              });
+              setLoading(false);
+              setAlertStatus("danger");
+              setAlertMsg("Unable to update information. Please try again later.");
+              setAlertVisible(true);
             } else if (isAuthenticated().user.role === "admin") {
-              this.setState({
-                loading: false,
-                alertStatus: "success",
-                alertMsg: "User information updated.",
-                alertVisible: true,
-              });
+              setLoading(false);
+              setAlertStatus("success");
+              setAlertMsg("User information updated.");
+              setAlertVisible(true);
             } else {
               updateLocalStorUser(data, () => {
-                this.setState({
-                  loading: false,
-                  alertStatus: "success",
-                  alertMsg: "User information updated.",
-                  alertVisible: true,
-                });
+                setLoading(false);
+                setAlertStatus("success");
+                setAlertMsg("User information updated.");
+                setAlertVisible(true);
               });
             }
             setSubmitting(false);
-          }, 2000);
-        });
+          });
+        }, 2000);
       }}
     >
       {({ touched, errors, isSubmitting }) => (
@@ -293,69 +288,54 @@ class SettingUser extends Component {
     </Formik>
   );
 
-  render() {
-    const {
-      user: { id },
-      redirectToProfile,
-      loading,
-      alertMsg,
-      alertStatus,
-      alertVisible,
-    } = this.state;
+  if (redirectToProfile) {
+    return <Navigate to={`/user/${user.id}`} />;
+  }
 
-    if (redirectToProfile) {
-      return <Navigate to={`/user/${id}`} />;
-    }
-
-    return (
-      <>
-        <Alert type={alertStatus} message={alertMsg} visible={alertVisible} />
-        <Oval
-          active={loading}
-          spinner
-          styles={{
-            spinner: (base) => ({
-              ...base,
-              width: "100px",
-              "& svg circle": {
-                stroke: "rgba(0,98,204,1)",
-              },
-            }),
-            wrapper: {
-              height: "100%",
-            },
-          }}
-          text="Updating your profile...."
-        >
-          <div className="maxDivWidth container-fluid">
-            <div className="row my-3">
-              {/* SettingSidebar is col-sm-3 */}
-              <SettingSidebar highlight="UserSetting" userId={id} />
-              <div className="col-sm-9">
-                <div className="card">
-                  <div className="card-body">
-                    <div className="row">
-                      <div className="col-md-12">
-                        <h2>Basic Information</h2>
-                        <hr />
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-12">
-                        {(isAuthenticated().user.role === "admin" ||
-                          isAuthenticated().user._id === id) &&
-                          this.userProfileForm()}
-                      </div>
-                    </div>
+  return (
+    <>
+      <Alert type={alertStatus} message={alertMsg} visible={alertVisible} />
+      {loading && (
+        <div className="d-flex justify-content-center">
+          <Oval
+            height={40}
+            width={40}
+            color="#4fa94d"
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#4fa94d"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
+      <div className="maxDivWidth container-fluid">
+        <div className="row my-3">
+          {/* SettingSidebar is col-sm-3 */}
+          <SettingSidebar highlight="UserSetting" userId={user.id} />
+          <div className="col-sm-9">
+            <div className="card">
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-md-12">
+                    <h2>Basic Information</h2>
+                    <hr />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-12">
+                    {(isAuthenticated().user.role === "admin" ||
+                      isAuthenticated().user._id === user.id) &&
+                      userProfileForm()}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </Oval>
-      </>
-    );
-  }
-}
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default SettingUser;

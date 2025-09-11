@@ -8,26 +8,8 @@ import BgLogo from "../images/BgLogo.png";
 import Helpers from "../helpers";
 import GettingStartedAlert from "./GettingStartedAlert";
 
-interface NavBarProps {}
-
-interface NavBarState {}
-
-class NavBar extends React.Component<NavBarProps, NavBarState> {
-  // constructor() {
-  //   super();
-  //   // if (isAuthenticated().user) {
-  //   //   this.state = {
-  //   //     notifications: this.getNotifications()
-  //   //   };
-  //   // } else {
-  //   //   this.state = {
-  //   //     notifications: []
-  //   //   };
-
-  //   // }
-  // }
-
-  // getNotifications = async () => {
+const NavBar: React.FC = () => {
+  // const getNotifications = async () => {
   //   var notifications = [];
   //   await getEventsByUserId(isAuthenticated().user._id, isAuthenticated().token)
   //     .then(event => {
@@ -61,8 +43,11 @@ class NavBar extends React.Component<NavBarProps, NavBarState> {
   //   return notifications;
   // };
 
-  render() {
-    return (
+  const handleSignOut = () => {
+    signout(() => (window.location.href = "/"));
+  };
+
+  return (
       <div>
         <nav className="navbar navbar-icon-top navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
           <div className="container-fluid">
@@ -245,7 +230,7 @@ class NavBar extends React.Component<NavBarProps, NavBarState> {
                           data-toggle="tooltip"
                           title="Sign Out"
                           aria-label="Sign Out"
-                          onClick={() => signout(() => (window.location = "/"))}
+                          onClick={handleSignOut}
                           style={{ cursor: "pointer" }}
                         >
                           Sign Out
@@ -261,7 +246,6 @@ class NavBar extends React.Component<NavBarProps, NavBarState> {
         {isAuthenticated ? <GettingStartedAlert /> : null}
       </div>
     );
-  }
-}
+};
 
 export default NavBar;

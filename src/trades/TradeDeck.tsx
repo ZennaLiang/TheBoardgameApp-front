@@ -1,83 +1,83 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { isAuthenticated } from "../auth";
 import { getGuruCollection } from "../boardgame/apiBoardgame";
 import { getUserId } from "../user/apiUser";
 import { Input } from "reactstrap";
 import TradeCard from "./TradeCard";
 
-class TradeDeck extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      bgData: [{}],
-      isLoading: true,
-      search: null
-    };
-  }
+interface TradeDeckProps {
+  userId: string;
+  user?: string;
+  bgData: any[];
+  listID: string;
+}
 
-  async loadBoardgameData(user) {
-    await getUserId(user)
-      .then(id => {
-        getGuruCollection(id, isAuthenticated().token).then(bgList => {
-          this.state.bgData = bgList;
-          console.log(bgList);
-          this.setState({ bgData: bgList, isLoading: false });
-        });
-      })
-      .catch(err => {
+const TradeDeck: React.FC<TradeDeckProps> = ({ userId, user, bgData, listID }) => {
+  const [bgDataState, setBgDataState] = useState<any[]>([{}]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState<string | null>(null);
+  const [redirectToHome, setRedirectToHome] = useState(false);
+
+  useEffect(() => {
+    const loadBoardgameData = async (userName: string) => {
+      try {
+        const id = await getUserId(userName);
+        const bgList = await getGuruCollection(id, isAuthenticated().token);
+        setBgDataState(bgList);
+        console.log(bgList);
+        setIsLoading(false);
+      } catch (err) {
         console.log(err);
-      });
-  }
+        setIsLoading(false);
+      }
+    };
 
-  UNSAFE_componentWillMount() {
     if (
-      isAuthenticated()._id !== this.props.userId &&
+      isAuthenticated()._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
-      this.setState({ redirectToHome: true });
+      setRedirectToHome(true);
     }
 
-    let user = "";
-    if (this.props.user === "" || this.props.user === undefined) {
-      user = isAuthenticated().user.name;
+    let userName = "";
+    if (user === "" || user === undefined) {
+      userName = isAuthenticated().user.name;
     } else {
-      user = this.props.user;
+      userName = user;
     }
-    this.loadBoardgameData(user);
-  }
+    loadBoardgameData(userName);
+  }, [userId, user]);
 
-  searchSpace = event => {
-    let keyword = event.target.value;
-    this.setState({ search: keyword });
+  const searchSpace = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const keyword = event.target.value;
+    setSearch(keyword);
   };
 
-  render() {
-    const items = this.props.bgData.filter(data => {
-      if (this.state.search == null) return data;
-      else if (
-        data.boardgame.title
-          .toLowerCase()
-          .includes(this.state.search.toLowerCase())
-      ) {
-        return data;
-      }
-      return 0;
-    });
+  const items = bgData.filter(data => {
+    if (search == null) return data;
+    else if (
+      data.boardgame.title
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    ) {
+      return data;
+    }
+    return false;
+  });
 
-    return (
-      <div id={this.props.listID}>
-        <Input
-          type="search"
-          id="searchList"
-          onChange={e => this.searchSpace(e)}
-        ></Input>
-        {items.map((bg, i) => {
-          return <TradeCard id={bg._id} key={bg._id} bg={bg} />;
-        })}
+  return (
+    <div id={listID}>
+      <Input
+        type="search"
+        id="searchList"
+        onChange={searchSpace}
+      />
+      {items.map((bg, i) => {
+        return <TradeCard id={bg._id} key={bg._id} bg={bg} />;
+      })}
 
-        <div className="invalid-feedback">Please select a game to trade.</div>
-      </div>
-    );
-  }
-}
+      <div className="invalid-feedback">Please select a game to trade.</div>
+    </div>
+  );
+};
 export default TradeDeck;

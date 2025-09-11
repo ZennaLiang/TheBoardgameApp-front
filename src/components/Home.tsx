@@ -1,16 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import gsap from "gsap";
 import inView from "in-view";
 import Footer from "./Footer";
 import SVGComponent from "./SVGComponent";
 
-interface HomeProps {}
-
-interface HomeState {}
-
-class Home extends React.Component<HomeProps, HomeState> {
-  componentDidMount() {
+const Home: React.FC = () => {
+  useEffect(() => {
     let tl = gsap.timeline();
     tl.set(".animator", {
       opacity: 0,
@@ -54,9 +50,9 @@ class Home extends React.Component<HomeProps, HomeState> {
           opacity: 0,
         });
       });
-  }
-  render() {
-    return (
+  }, []);
+
+  return (
       <div className="container-fluid home">
         <div className="row homeOne align-items-center">
           <div className="col-12 col-lg-4 offset-lg-2 d-flex justify-content-center align-items-end align-items-lg-center mb-4 mb-lg-0">
@@ -142,6 +138,6 @@ class Home extends React.Component<HomeProps, HomeState> {
         <Footer />
       </div>
     );
-  }
-}
+};
+
 export default Home;

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Navigate, useParams } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage, getIn } from "formik";
 import * as Yup from "yup";
 import { isAuthenticated } from "../auth";
@@ -14,83 +14,77 @@ import { Oval } from 'react-loader-spinner';
 import Alert from "../components/Alert";
 import SettingSidebar from "./SettingSideBar";
 
-class SettingCollection extends Component {
-  constructor() {
-    super();
-    this.state = {
-      user: {
-        id: "",
-        bggUsername: "",
-      },
-      redirectToProfile: false,
-      loading: false,
-      alertStatus: "",
-      alertMsg: "",
-      alertVisible: false,
-    };
-  }
+const SettingCollection: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+  const [user, setUser] = useState({
+    id: "",
+    bggUsername: "",
+  });
+  const [redirectToProfile, setRedirectToProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [alertStatus, setAlertStatus] = useState("");
+  const [alertMsg, setAlertMsg] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
 
-  init = (userId) => {
-    const token = isAuthenticated().token;
-    getUser(userId, token).then((data) => {
-      if (data.error) {
-        this.setState({ redirectToProfile: true });
-      } else {
-        this.setState({
-          user: {
+
+  useEffect(() => {
+    const init = async (userId: string) => {
+      const token = isAuthenticated().token;
+      try {
+        const data = await getUser(userId, token);
+        if (data.error) {
+          setRedirectToProfile(true);
+        } else {
+          setUser({
             id: data._id,
             bggUsername: data.bggUsername === undefined ? "" : data.bggUsername,
-          },
-        });
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        setRedirectToProfile(true);
       }
-    });
-  };
+    };
 
-  componentDidMount() {
-    this.userData = new FormData();
-    const userId = this.props.match.params.userId;
-    this.init(userId);
-  }
+    if (!userId) return;
+    init(userId);
+  }, [userId]);
 
-  bggForm = (bggUsername) => (
+  const bggForm = (bggUsername: string) => (
     <Formik
       enableReinitialize={true}
-      initialValues={this.state.user}
+      initialValues={user}
       validationSchema={Yup.object().shape({
         bggUsername: Yup.string().required("Name is required"),
       })}
       onSubmit={(values, { setSubmitting }) => {
-        this.setState({ loading: true });
-        this.userData.append("bggUsername", values.bggUsername);
+        setLoading(true);
+        const userData = new FormData();
+        userData.append("bggUsername", values.bggUsername);
         setTimeout(() => {
-          const userId = this.props.match.params.userId;
+          if (!userId) return;
           const token = isAuthenticated().token;
 
           updateBggBoardgamesByUsername(userId, token, values.bggUsername).then(
             (data) => {
               if (data.error) {
-                this.setState({
-                  alertStatus: "danger",
-                  alertMsg: data.error,
-                });
+                setAlertStatus("danger");
+                setAlertMsg(data.error);
               } else if (isAuthenticated().user.role === "admin") {
-                this.setState({
-                  alertStatus: "success",
-                  alertMsg: "User information updated.",
-                });
+                setAlertStatus("success");
+                setAlertMsg("User information updated.");
               } else {
                 getGuruCollection(isAuthenticated().user._id, token).then((collection) => {
                   data.user.boardgames = collection;
                    updateLocalStorUser(data, () => {
-                    this.setState({
-                      alertStatus: "success",
-                      alertMsg: "User information updated.",
-                    });
+                    setAlertStatus("success");
+                    setAlertMsg("User information updated.");
                   });
                 })
               }
 
-              this.setState({ loading: false, alertVisible: true });
+              setLoading(false);
+              setAlertVisible(true);
               setSubmitting(false);
             },
             5000
@@ -139,71 +133,65 @@ class SettingCollection extends Component {
     </Formik>
   );
 
-  render() {
-    const {
-      user: { id },
-      bggUsername,
-      redirectToProfile,
-      loading,
-      alertMsg,
-      alertStatus,
-      alertVisible,
-    } = this.state;
+  if (redirectToProfile) {
+    return <Navigate to={`/user/${user.id}`} />;
+  }
 
-    if (redirectToProfile) {
-      return <Navigate to={`/user/${id}`} />;
-    }
-
-    return (
-      <>
-        <Alert type={alertStatus} message={alertMsg} visible={alertVisible} />
-     <Oval
-  height={40}
-  width={40}
-  color="#4fa94d"
-  visible={loading}
-  ariaLabel="oval-loading"
->
-          <div className="maxDivWidth container-fluid">
-            <div className="row my-3">
-              {/* SettingSidebar is col-sm-3 */}
-              <SettingSidebar highlight="Boardgame" userId={id} />
-              <div className="col-sm-9">
-                <div className="card">
-                  <div className="card-body">
-                    <div className="row">
-                      <div className="col-md-12">
-                        <h2>Boardgamegeek Information</h2>
-                        <hr />
-                      </div>
-                    </div>
-                    <div className="row mb-3">
-                      <div className="col-md-12">
-                        <h6 className="lead">
-                          <span className="font-weight-bold">Note: </span>{" "}
-                          Syncing your Boardgamegeek collection will not remove
-                          any boardgame from Boardgameguru. It will add any
-                          boardgame(s) missing and update status from
-                          boardgamegeek to boardgameguru.
-                        </h6>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-12">
-                        {(isAuthenticated().user.role === "admin" ||
-                          isAuthenticated().user._id === id) &&
-                          this.bggForm(bggUsername)}
-                      </div>
-                    </div>
+  return (
+    <>
+      <Alert type={alertStatus} message={alertMsg} visible={alertVisible} />
+      {loading && (
+        <div className="d-flex justify-content-center">
+          <Oval
+            height={40}
+            width={40}
+            color="#4fa94d"
+            visible={true}
+            ariaLabel="oval-loading"
+            secondaryColor="#4fa94d"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
+      <div className="maxDivWidth container-fluid">
+        <div className="row my-3">
+          {/* SettingSidebar is col-sm-3 */}
+          <SettingSidebar highlight="Boardgame" userId={user.id} />
+          <div className="col-sm-9">
+            <div className="card">
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-md-12">
+                    <h2>Boardgamegeek Information</h2>
+                    <hr />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-md-12">
+                    <h6 className="lead">
+                      <span className="font-weight-bold">Note: </span>{" "}
+                      Syncing your Boardgamegeek collection will not remove
+                      any boardgame from Boardgameguru. It will add any
+                      boardgame(s) missing and update status from
+                      boardgamegeek to boardgameguru.
+                    </h6>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-12">
+                    {(isAuthenticated().user.role === "admin" ||
+                      isAuthenticated().user._id === user.id) &&
+                      bggForm(user.bggUsername)}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </Oval>
-      </>
-    );
-  }
-}
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default SettingCollection;

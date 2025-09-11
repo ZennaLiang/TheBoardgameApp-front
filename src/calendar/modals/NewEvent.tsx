@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import EventForm from "./EventForm";
 import { isAuthenticated } from "../../auth";
-//
-const NewEvent = (props) => {
+
+interface NewEventProps {
+  userId?: string;
+}
+
+const NewEvent: React.FC<NewEventProps> = (props) => {
   const [event, setEvent] = useState({
     title: "",
     allDay: false,
@@ -15,8 +19,6 @@ const NewEvent = (props) => {
     boardgames: [],
     tempBoardgame: "",
   });
-
-  const { userId } = props;
 
   const reset = () => {
     setEvent({
@@ -38,7 +40,6 @@ const NewEvent = (props) => {
         modalId="add-event"
         modalTitle="Add Event"
         eventInfo={event}
-        userId={userId}
         resetModal={reset}
       />
     </>

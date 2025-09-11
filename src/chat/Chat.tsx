@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { isAuthenticated } from "../auth";
 
@@ -41,288 +41,262 @@ interface ToastMessage {
 
 interface ChatProps {}
 
-interface ChatState {
-  isOpen: boolean;
-  chatSelected: boolean;
-  selectedChat: ChatData;
-  user: any;
-  chats: ChatData[];
-  newMessage: boolean;
-  loading: string | null;
-  muted: boolean;
-  userSearchResults: ChatUser[];
-  toastMsg: ToastMessage | null;
-}
+const Chat: React.FC<ChatProps> = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [chatSelected, setChatSelected] = useState(false);
+  const [selectedChat, setSelectedChat] = useState<ChatData>({} as ChatData);
+  const [user, setUser] = useState(isAuthenticated().user);
+  const [chats, setChats] = useState<ChatData[]>([]);
+  const [newMessage, setNewMessage] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [userSearchResults, setUserSearchResults] = useState<ChatUser[]>([]);
+  const [toastMsg, setToastMsg] = useState<ToastMessage | null>(null);
+  
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>();
+  const intervalRef = useRef<NodeJS.Timeout | undefined>();
+  const wsRef = useRef<any>(null);
 
-class Chat extends React.Component<ChatProps, ChatState> {
-  searchTimeout: NodeJS.Timeout | undefined;
-
-  constructor(props: ChatProps) {
-    super(props);
-    this.state = {
-      isOpen: false,
-      chatSelected: false,
-      selectedChat: {} as ChatData,
-      user: isAuthenticated().user,
-      chats: [],
-      newMessage: false,
-      loading: null,
-      muted: false,
-      userSearchResults: [],
-      toastMsg: null
-    };
-  }
-
-  toast = (message: string, type: string = "danger") => {
-    this.setState({
-      toastMsg: { type, message }
-    });
+  const toast = useCallback((message: string, type: string = "danger") => {
+    setToastMsg({ type, message });
 
     setTimeout(() => {
-      this.setState({
-        toastMsg: null
-      });
+      setToastMsg(null);
     }, 3000);
-  };
+  }, []);
 
-  componentDidMount() {
+  useEffect(() => {
     try {
-      let muted = localStorage.getItem("muted") === "true";
-      this.setState({
-        muted
-      });
+      const mutedFromStorage = localStorage.getItem("muted") === "true";
+      setMuted(mutedFromStorage);
     } catch (error) {
       console.log(error);
     }
 
-    apiInitSocket(isAuthenticated().token).then(async ws => {
+    const initializeSocket = async () => {
       try {
-        await this.getChats();
+        const ws = await apiInitSocket(isAuthenticated().token);
+        wsRef.current = ws;
+        
+        await getChats();
 
-        setInterval(() => {
-          this.getChats(true);
-        }, process.env.REACT_APP_CHAT_REFRESH || 60000);
+        intervalRef.current = setInterval(() => {
+          getChats(true);
+        }, parseInt(process.env.REACT_APP_CHAT_REFRESH || "60000"));
 
-        ws.on("newMsg", data => {
-          if (!this.state.muted && data.from !== isAuthenticated().user._id) {
-            document.getElementById("msgDing").play();
-          }
-
-          if (
-            this.state.chatSelected &&
-            data._id === this.state.selectedChat._id
-          ) {
-            let clone = this.state.selectedChat;
-            clone.messages.push(data);
-
-            this.setState({
-              selectedChat: clone
-            });
-
-            if (!this.state.isOpen) {
-              this.setState({
-                newMessage: true
-              });
+        ws.on("newMsg", (data: any) => {
+          setMuted(currentMuted => {
+            if (!currentMuted && data.from !== isAuthenticated().user._id) {
+              const audioElement = document.getElementById("msgDing") as HTMLAudioElement;
+              audioElement?.play();
             }
+            return currentMuted;
+          });
 
-            this.scrollChat();
-          } else {
-            apiGetChat(isAuthenticated().token, data._id).then(chat => {
-              let i = this.state.chats.findIndex(c => c._id === chat._id);
-              let clone = this.state.chats;
-              clone[i] = chat;
-
-              this.setState({
-                chats: clone
+          setChatSelected(currentChatSelected => {
+            if (currentChatSelected) {
+              setSelectedChat(prevChat => {
+                if (data._id === prevChat._id) {
+                  setIsOpen(currentIsOpen => {
+                    if (!currentIsOpen) {
+                      setNewMessage(true);
+                    }
+                    return currentIsOpen;
+                  });
+                  
+                  scrollChat();
+                  return {
+                    ...prevChat,
+                    messages: [...prevChat.messages, data]
+                  };
+                }
+                return prevChat;
               });
-            });
-            this.setState({
-              newMessage: true
-            });
-          }
+            } else {
+              apiGetChat(isAuthenticated().token, data._id).then(chat => {
+                setChats(prev => {
+                  const index = prev.findIndex(c => c._id === chat._id);
+                  const newChats = [...prev];
+                  if (index !== -1) {
+                    newChats[index] = chat;
+                  }
+                  return newChats;
+                });
+              });
+              setNewMessage(true);
+            }
+            return currentChatSelected;
+          });
         });
       } catch (error) {
         console.log(error);
       }
-    });
-  }
+    };
 
-  getChats = (isRefresh = false) => {
+    initializeSocket();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.disconnect?.();
+      }
+    };
+  }, []);
+
+  const getChats = useCallback((isRefresh = false) => {
     return new Promise((resolve, reject) => {
       apiGetChats(isAuthenticated().token, isRefresh)
-        .then(chats => {
+        .then(chatsData => {
           if (
             isRefresh &&
+            chatsData.length &&
             chats.length &&
-            this.state.chats.length &&
-            this.state.chats.length < chats.length
+            chats.length < chatsData.length
           ) {
-            this.setState({
-              newMessage: true
-            });
-            document.getElementById("msgDing").play();
+            setNewMessage(true);
+            const audioElement = document.getElementById("msgDing") as HTMLAudioElement;
+            audioElement?.play();
           }
-          this.setState({
-            chats,
-            loading: null
-          });
-          resolve(chats);
+          setChats(chatsData);
+          setLoading(null);
+          resolve(chatsData);
         })
         .catch(err => {
           reject(err);
         });
     });
-  };
+  }, [chats.length]);
 
-  openChatWindow = async () => {
+  const openChatWindow = useCallback(async () => {
     try {
-      this.setState({
-        isOpen: true,
-        loading: "chats",
-        newMessage: false
-      });
-      await this.getChats();
-      this.scrollChat();
+      setIsOpen(true);
+      setLoading("chats");
+      setNewMessage(false);
+      await getChats();
+      scrollChat();
     } catch (error) {
-      this.setState({
-        loading: null
-      });
+      setLoading(null);
       console.log(error);
     }
-  };
+  }, [getChats]);
 
-  closeChatWindow = () => {
-    this.setState({
-      isOpen: false,
-      chats: []
-    });
-  };
+  const closeChatWindow = useCallback(() => {
+    setIsOpen(false);
+    setChats([]);
+  }, []);
 
-  createChat = async () => {
+  const createChat = useCallback(async () => {
     try {
-      let resp = await apiCreateChat(
-        document.getElementById("usernameSearch").value,
+      const usernameInput = document.getElementById("usernameSearch") as HTMLInputElement;
+      const resp = await apiCreateChat(
+        usernameInput.value,
         isAuthenticated().token
       );
-      let clone = this.state.chats;
-      clone.push(resp);
-      this.setState({
-        chats: clone
-      });
-      document.getElementById("usernameSearch").value = "";
+      setChats(prev => [...prev, resp]);
+      usernameInput.value = "";
     } catch (error) {
       switch (error) {
         case 400:
-          this.toast("User not found, check spelling.");
+          toast("User not found, check spelling.");
           break;
         case 409:
           console.log("Chat exists, carry on...");
           break;
 
         default:
-          this.toast("Something went wrong, please refresh and try again.");
+          toast("Something went wrong, please refresh and try again.");
           break;
       }
     }
-  };
+  }, [toast]);
 
 
-  searchUser = (e: any) => {
-    clearTimeout(this.searchTimeout);
-    this.setState({
-      loading: "searchUsers"
-    });
-    this.searchTimeout = setTimeout(async () => {
-      let value = document.getElementById("usernameSearch").value;
+  const searchUser = useCallback((e: any) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    setLoading("searchUsers");
+    searchTimeoutRef.current = setTimeout(async () => {
+      const usernameInput = document.getElementById("usernameSearch") as HTMLInputElement;
+      const value = usernameInput.value;
       if (value === "" || value === " ") {
-        this.setState({
-          userSearchResults: [],
-          loading: null
-        });
+        setUserSearchResults([]);
+        setLoading(null);
         return 0;
       }
       try {
-        let resp = await apiSearchUser(isAuthenticated().token, value);
-        this.setState({
-          userSearchResults: resp,
-          loading: null
-        });
+        const resp = await apiSearchUser(isAuthenticated().token, value);
+        setUserSearchResults(resp);
+        setLoading(null);
         if (resp.length < 1) {
-          throw new Error(404);
+          throw new Error("404");
         }
       } catch (error) {
         if (error === 429) {
-          this.toast("You're doing that too often, try again soon.");
-        } else if (error === 404) {
-          this.toast("No users found.");
+          toast("You're doing that too often, try again soon.");
+        } else if (error === 404 || (error instanceof Error && error.message === "404")) {
+          toast("No users found.");
         } else {
-          this.toast("Something went wrong. Please refresh and try again");
+          toast("Something went wrong. Please refresh and try again");
         }
 
-        this.setState({
-          loading: null
-        });
+        setLoading(null);
       }
     }, 200);
-  };
+  }, [toast]);
 
-  selectUser = (e: any) => {
-    document.getElementById("usernameSearch").value = e.target.dataset.username;
-    this.createChat();
-    this.setState({
-      userSearchResults: []
-    });
-  };
+  const selectUser = useCallback((e: any) => {
+    const usernameInput = document.getElementById("usernameSearch") as HTMLInputElement;
+    usernameInput.value = e.target.dataset.username;
+    createChat();
+    setUserSearchResults([]);
+  }, [createChat]);
 
-  getChat = async (e: any) => {
+  const getChat = useCallback(async (e: any) => {
     try {
-      let id = e.currentTarget.dataset.id;
+      const id = e.currentTarget.dataset.id;
 
-      this.setState({
-        loading: id
-      });
+      setLoading(id);
 
-      let chat = await apiGetChat(isAuthenticated().token, id);
+      const chat = await apiGetChat(isAuthenticated().token, id);
 
-      this.setState({
-        chatSelected: true,
-        selectedChat: chat,
-        loading: null
-      });
+      setChatSelected(true);
+      setSelectedChat(chat);
+      setLoading(null);
 
-      this.scrollChat();
+      scrollChat();
     } catch (error) {
-      this.setState({
-        loading: null
-      });
+      setLoading(null);
       console.log(error);
     }
-  };
+  }, []);
 
-  closeChat = async () => {
+  const closeChat = useCallback(async () => {
     try {
-      this.setState({
-        chatSelected: false,
-        loading: "chats",
-        chats: []
-      });
+      setChatSelected(false);
+      setLoading("chats");
+      setChats([]);
 
-      await this.getChats();
-      this.setState({
-        selectedChat: {}
-      });
+      await getChats();
+      setSelectedChat({} as ChatData);
     } catch (error) {
-      this.toast(
+      toast(
         "An error occurred while getting chats, check log for more info."
       );
       console.log(error);
     }
-  };
+  }, [getChats, toast]);
 
-  sendChat = async () => {
+  const sendChat = useCallback(async () => {
     try {
-      let chatId = this.state.selectedChat._id;
-      let message = document.getElementById("chatBox").value;
+      const chatId = selectedChat._id;
+      const chatInput = document.getElementById("chatBox") as HTMLInputElement;
+      const message = chatInput.value;
 
       if (message.trim().length === 0) {
         throw new Error("Message empty.");
@@ -330,292 +304,288 @@ class Chat extends React.Component<ChatProps, ChatState> {
 
       apiSendChat(chatId, message, isAuthenticated().token);
 
-      document.getElementById("chatBox").value = "";
-      this.scrollChat();
+      chatInput.value = "";
+      scrollChat();
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [selectedChat._id]);
 
-  chatIsFromUser = (from: string | ChatUser) => {
-    let id = typeof from === 'string' ? from : from._id;
+  const chatIsFromUser = useCallback((from: string | ChatUser) => {
+    const id = typeof from === 'string' ? from : from._id;
     return id === isAuthenticated().user._id;
-  };
+  }, []);
 
-  scrollChat = () => {
-    let list = document.querySelector(".chatView");
+  const scrollChat = useCallback(() => {
+    const list = document.querySelector(".chatView") as HTMLElement;
     if (list) {
       list.scrollTop = list.scrollHeight;
     }
-  };
+  }, []);
 
-  muteToggle = () => {
-    localStorage.setItem("muted", !this.state.muted);
+  const muteToggle = useCallback(() => {
+    const newMutedState = !muted;
+    localStorage.setItem("muted", newMutedState.toString());
+    setMuted(newMutedState);
+  }, [muted]);
 
-    this.setState({
-      muted: !this.state.muted
-    });
-  };
-
-  render() {
-    return (
-      <div className="chatCont">
-        {isAuthenticated() && (
-          <div>
-            <audio id="msgDing" src="/pop.wav" controls={false}></audio>
-            {this.state.isOpen && (
-              <div className="chatWindow bg-white p-3 rounded-lg border shadow-sm">
-                {this.state.toastMsg && (
-                  <div
-                    className={`d-flex justify-content-center align-items-center alert alert-${this.state.toastMsg.type} chatAlert`}
-                  >
-                    <span style={{ fontSize: "0.8em" }}>
-                      {this.state.toastMsg.message}
-                    </span>
-                  </div>
-                )}
-                <div className="d-flex justify-content-between align-items-center text-info">
-                  {!this.state.chatSelected && (
-                    <div>
-                      <span>Chat</span>
-                    </div>
-                  )}
-                  {this.state.chatSelected && (
-                    <div
-                      className="cursor-pointer closeChat px-2"
-                      onClick={this.closeChat}
-                    >
-                      <i className="fa fa-arrow-left"></i>
-                    </div>
-                  )}
-                  {this.state.chatSelected && (
-                    <div className="justify-self-center">
-                      {
-                        this.state.selectedChat.between.filter(
-                          e => e._id !== isAuthenticated().user._id
-                        )[0].name
-                      }
-                    </div>
-                  )}
-                  <div>
-                    <i
-                      className={`fa ${
-                        this.state.muted ? "fa-volume-mute" : "fa-volume-up"
-                      } chatMute p-1 mr-2 cursor-pointer`}
-                      onClick={this.muteToggle}
-                    ></i>
-                    <i
-                      className="fa fa-angle-down closeChatWindow cursor-pointer p-2"
-                      onClick={this.closeChatWindow}
-                    ></i>
-                  </div>
+  return (
+    <div className="chatCont">
+      {isAuthenticated() && (
+        <div>
+          <audio id="msgDing" src="/pop.wav" controls={false}></audio>
+          {isOpen && (
+            <div className="chatWindow bg-white p-3 rounded-lg border shadow-sm">
+              {toastMsg && (
+                <div
+                  className={`d-flex justify-content-center align-items-center alert alert-${toastMsg.type} chatAlert`}
+                >
+                  <span style={{ fontSize: "0.8em" }}>
+                    {toastMsg.message}
+                  </span>
                 </div>
-
-                {!this.state.chatSelected && (
-                  <div className={`chatList my-2`}>
-                    {this.state.loading === "chats" && (
-                      <div className="text-center">
-                        <i className="fa fa-circle-notch loader"></i>
-                      </div>
-                    )}
-                    {this.state.chats.length < 1 && (
-                      <div className="text-center preChat py-5">
-                        No chats yet!
-                      </div>
-                    )}
-                    {this.state.chats
-                      .sort((a, b) => {
-                        let lastA, lastB;
-                        try {
-                          lastA = new Date(
-                            a.messages[a.messages.length - 1].timestamp
-                          ).getTime();
-                        } catch (error) {
-                          lastA = 0;
-                        }
-
-                        try {
-                          lastB = new Date(
-                            b.messages[b.messages.length - 1].timestamp
-                          ).getTime();
-                        } catch (error) {
-                          lastB = 0;
-                        }
-
-                        if (lastA > lastB) {
-                          return -1;
-                        } else if (lastA < lastB) {
-                          return 1;
-                        } else {
-                          return 0;
-                        }
-                      })
-                      .map((chat, i) => {
-                        return (
-                          <div
-                            className="cursor-pointer chat p-2 card chat text-info d-flex justify-content-between"
-                            onClick={this.getChat}
-                            key={chat._id}
-                            data-id={chat._id}
-                          >
-                            <div className="d-flex align-items-center justify-content-between">
-                              <img
-                                className="chatProfImg shadow-sm mx-3"
-                                alt="Chat Profile"
-                                src={`${
-                                  process.env.REACT_APP_API_URL
-                                }/user/photo/${
-                                  chat.between.filter(
-                                    e => e._id !== isAuthenticated().user._id
-                                  )[0]._id
-                                }`}
-                                onError={e => {
-                                  e.target.onerror = null;
-                                  e.target.src = `${DefaultProfileImg}`;
-                                }}
-                              />
-                              <div className="flex-grow-1">
-                                <h6>
-                                  {
-                                    chat.between.filter(
-                                      e => e._id !== isAuthenticated().user._id
-                                    )[0].name
-                                  }
-                                </h6>
-                                <div>
-                                  {chat.messages[chat.messages.length - 1] &&
-                                    moment(
-                                      chat.messages[chat.messages.length - 1]
-                                        .timestamp
-                                    ).fromNow()}
-                                </div>
-                              </div>
-                              {this.state.loading === chat._id && (
-                                <div className="d-flex justify-content-center align-items-center">
-                                  <i className="fa fa-circle-notch loader"></i>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
+              )}
+              <div className="d-flex justify-content-between align-items-center text-info">
+                {!chatSelected && (
+                  <div>
+                    <span>Chat</span>
                   </div>
                 )}
+                {chatSelected && (
+                  <div
+                    className="cursor-pointer closeChat px-2"
+                    onClick={closeChat}
+                  >
+                    <i className="fa fa-arrow-left"></i>
+                  </div>
+                )}
+                {chatSelected && (
+                  <div className="justify-self-center">
+                    {
+                      selectedChat.between?.filter(
+                        e => e._id !== isAuthenticated().user._id
+                      )[0]?.name
+                    }
+                  </div>
+                )}
+                <div>
+                  <i
+                    className={`fa ${
+                      muted ? "fa-volume-mute" : "fa-volume-up"
+                    } chatMute p-1 mr-2 cursor-pointer`}
+                    onClick={muteToggle}
+                  ></i>
+                  <i
+                    className="fa fa-angle-down closeChatWindow cursor-pointer p-2"
+                    onClick={closeChatWindow}
+                  ></i>
+                </div>
+              </div>
 
-                {/* Chat is open */}
-                {this.state.chatSelected && (
-                  <div className="chatView my-2">
-                    <div className="text-center preChat">
-                      Start the conversation! Note that we may clear out
-                      messages older than 3 months from time to time.
+              {!chatSelected && (
+                <div className={`chatList my-2`}>
+                  {loading === "chats" && (
+                    <div className="text-center">
+                      <i className="fa fa-circle-notch loader"></i>
                     </div>
-                    {this.state.selectedChat.messages.map((msg, i) => {
+                  )}
+                  {chats.length < 1 && (
+                    <div className="text-center preChat py-5">
+                      No chats yet!
+                    </div>
+                  )}
+                  {chats
+                    .sort((a, b) => {
+                      let lastA, lastB;
+                      try {
+                        lastA = new Date(
+                          a.messages[a.messages.length - 1].timestamp
+                        ).getTime();
+                      } catch (error) {
+                        lastA = 0;
+                      }
+
+                      try {
+                        lastB = new Date(
+                          b.messages[b.messages.length - 1].timestamp
+                        ).getTime();
+                      } catch (error) {
+                        lastB = 0;
+                      }
+
+                      if (lastA > lastB) {
+                        return -1;
+                      } else if (lastA < lastB) {
+                        return 1;
+                      } else {
+                        return 0;
+                      }
+                    })
+                    .map((chat, i) => {
                       return (
                         <div
-                          key={msg.timestamp}
-                          className={`
-                            d-flex justify-content-between rounded-lg chatMsg 
-                            ${this.chatIsFromUser(msg.from) ? "from" : ""}`}
+                          className="cursor-pointer chat p-2 card chat text-info d-flex justify-content-between"
+                          onClick={getChat}
+                          key={chat._id}
+                          data-id={chat._id}
                         >
-                          <div className="msgText">{msg.message}</div>
-                          <div className="msgTime">
-                            {moment(msg.timestamp).fromNow()}
+                          <div className="d-flex align-items-center justify-content-between">
+                            <img
+                              className="chatProfImg shadow-sm mx-3"
+                              alt="Chat Profile"
+                              src={`${
+                                process.env.REACT_APP_API_URL
+                              }/user/photo/${
+                                chat.between.filter(
+                                  e => e._id !== isAuthenticated().user._id
+                                )[0]._id
+                              }`}
+                              onError={(e: any) => {
+                                e.target.onerror = null;
+                                e.target.src = `${DefaultProfileImg}`;
+                              }}
+                            />
+                            <div className="flex-grow-1">
+                              <h6>
+                                {
+                                  chat.between.filter(
+                                    e => e._id !== isAuthenticated().user._id
+                                  )[0].name
+                                }
+                              </h6>
+                              <div>
+                                {chat.messages[chat.messages.length - 1] &&
+                                  moment(
+                                    chat.messages[chat.messages.length - 1]
+                                      .timestamp
+                                  ).fromNow()}
+                              </div>
+                            </div>
+                            {loading === chat._id && (
+                              <div className="d-flex justify-content-center align-items-center">
+                                <i className="fa fa-circle-notch loader"></i>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
                     })}
-                  </div>
-                )}
+                </div>
+              )}
 
-                {!this.state.chatSelected && (
-                  <div className="input-group">
-                    {(this.state.userSearchResults.length > 0 ||
-                      this.state.loading === "searchUsers") && (
-                      <div className="bg-white rounded-lg card usersFound">
-                        {this.state.loading !== "searchUsers" ? (
-                          this.state.userSearchResults.map(res => {
-                            return (
-                              <div
-                                className="result"
-                                key={res._id}
-                                data-username={res.name}
-                                onClick={this.selectUser}
-                              >
-                                {res.name}
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="text-center px-2">
-                            <i className="fa fa-circle-notch loader"></i>
-                          </div>
-                        )}
+              {/* Chat is open */}
+              {chatSelected && (
+                <div className="chatView my-2">
+                  <div className="text-center preChat">
+                    Start the conversation! Note that we may clear out
+                    messages older than 3 months from time to time.
+                  </div>
+                  {selectedChat.messages?.map((msg, i) => {
+                    return (
+                      <div
+                        key={msg.timestamp}
+                        className={`
+                          d-flex justify-content-between rounded-lg chatMsg 
+                          ${chatIsFromUser(msg.from) ? "from" : ""}`}
+                      >
+                        <div className="msgText">{msg.message}</div>
+                        <div className="msgTime">
+                          {moment(msg.timestamp).fromNow()}
+                        </div>
                       </div>
-                    )}
-                    <input
-                      id="usernameSearch"
-                      type="text"
-                      className="form-control border-primary rounded"
-                      placeholder="Start typing a username"
-                      onKeyUp={e => {
-                        if (e.key === "Enter") {
-                          this.createChat();
-                        } else {
-                          this.searchUser(e);
-                        }
-                      }}
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-primary"
-                        onClick={this.createChat}
-                      >
-                        <i className="fa fa-user-plus"></i>
-                      </button>
-                    </div>
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
+              )}
 
-                {this.state.chatSelected && (
-                  <div className="input-group">
-                    <input
-                      id="chatBox"
-                      type="text"
-                      className="form-control border-primary"
-                      placeholder="Type your message"
-                      onKeyUp={e => {
-                        if (e.key === "Enter") {
-                          this.sendChat();
-                        }
-                      }}
-                    />
-                    <div className="input-group-append">
-                      <button
-                        className="btn btn-primary"
-                        onClick={this.sendChat}
-                      >
-                        <i className="fa fa-paper-plane"></i>
-                      </button>
+              {!chatSelected && (
+                <div className="input-group">
+                  {(userSearchResults.length > 0 ||
+                    loading === "searchUsers") && (
+                    <div className="bg-white rounded-lg card usersFound">
+                      {loading !== "searchUsers" ? (
+                        userSearchResults.map(res => {
+                          return (
+                            <div
+                              className="result"
+                              key={res._id}
+                              data-username={res.name}
+                              onClick={selectUser}
+                            >
+                              {res.name}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="text-center px-2">
+                          <i className="fa fa-circle-notch loader"></i>
+                        </div>
+                      )}
                     </div>
+                  )}
+                  <input
+                    id="usernameSearch"
+                    type="text"
+                    className="form-control border-primary rounded"
+                    placeholder="Start typing a username"
+                    onKeyUp={e => {
+                      if (e.key === "Enter") {
+                        createChat();
+                      } else {
+                        searchUser(e);
+                      }
+                    }}
+                  />
+                  <div className="input-group-append">
+                    <button
+                      className="btn btn-primary"
+                      onClick={createChat}
+                    >
+                      <i className="fa fa-user-plus"></i>
+                    </button>
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
 
-            {!this.state.isOpen && (
-              <div
-                className="chatOpener bg-white"
-                onClick={this.openChatWindow}
-              >
-                {this.state.newMessage && <div className="newMsgBadge"></div>}
-                <i className="fa fa-comments"></i>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  }
-}
+              {chatSelected && (
+                <div className="input-group">
+                  <input
+                    id="chatBox"
+                    type="text"
+                    className="form-control border-primary"
+                    placeholder="Type your message"
+                    onKeyUp={e => {
+                      if (e.key === "Enter") {
+                        sendChat();
+                      }
+                    }}
+                  />
+                  <div className="input-group-append">
+                    <button
+                      className="btn btn-primary"
+                      onClick={sendChat}
+                    >
+                      <i className="fa fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isOpen && (
+            <div
+              className="chatOpener bg-white"
+              onClick={openChatWindow}
+            >
+              {newMessage && <div className="newMsgBadge"></div>}
+              <i className="fa fa-comments"></i>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default Chat;

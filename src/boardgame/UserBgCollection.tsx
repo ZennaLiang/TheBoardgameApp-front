@@ -10,7 +10,7 @@ import { isAuthenticated } from "../auth";
 import { getUser } from "../user/apiUser";
 import BgContainer from "./BgContainer";
 
-const Table = ({ columns, data }) => {
+const Table = ({ columns, data }: any) => {
   const filterTypes = React.useMemo(
     () => ({
       fuzzyText: fuzzyTextFilterFn,
@@ -29,7 +29,7 @@ const Table = ({ columns, data }) => {
   );
 
   const defaultColumn = React.useMemo(
-    () => ({
+    (): any => ({
       Filter: DefaultColumnFilter,
     }),
     []
@@ -60,11 +60,11 @@ const Table = ({ columns, data }) => {
         pageIndex: 0,
         hiddenColumns: ["minPlayers"],
       },
-    },
+    } as any,
     useFilters,
     useSortBy,
     usePagination
-  );
+  ) as any;
 
   return (
     <>
@@ -94,7 +94,7 @@ const Table = ({ columns, data }) => {
         <tbody {...getTableBodyProps()}>
           {page.length === 0 ? (
             <tr>
-              <td colSpan="5" className="align-middle">
+              <td colSpan={5} className="align-middle">
                 No data
               </td>
             </tr>
@@ -362,7 +362,7 @@ const UserCollection = () => {
         headerClassName: "d-none d-md-table-cell ",
         accessor: "boardgame.avgRating",
         Cell: ({ cell: { value } }) => (
-          <span>{Math.round(10 * String(value)) / 10}</span>
+          <span>{Math.round(10 * Number(value)) / 10}</span>
         ),
         Filter: NumberSelectFilter,
         filter: filterGreaterThan,
@@ -545,8 +545,8 @@ const UserCollection = () => {
         color="#4fa94d"
         visible={isLoading}
         ariaLabel="oval-loading"
-      >
-        <BgContainer sidebar="UserCollection">
+      />
+      <BgContainer sidebar="UserCollection">
           <div className="row justify-content-center my-2">
             <div className="col-lg-10 text-center">
               <h2 className="header-font">Guru Collection</h2>
@@ -589,8 +589,7 @@ const UserCollection = () => {
           <div className="row justify-content-center bgTable table-responsive mr-0">
             <Table columns={columns} data={data} />
           </div>
-        </BgContainer>
-      </Oval>
+      </BgContainer>
     </>
   );
 };

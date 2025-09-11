@@ -1,11 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
 import NewEvent from "./modals/NewEvent";
 import { isAuthenticated } from "../auth";
-import { EventContext } from "../context/EventContext";
+import { useEvents } from "../context/EventContext";
 import EditEvent from "./modals/EditEvent";
 import ViewEvent from "./modals/ViewEvent";
-const SideBar = (props) => {
-  const { events, setSelectedEvent } = useContext(EventContext);
+
+interface SideBarProps {
+  userId: string;
+}
+
+const SideBar: React.FC<SideBarProps> = (props) => {
+  const { events, setSelectedEvent } = useEvents();
 
   return (
     <div className="col-lg-3 col-xl-2">
@@ -24,7 +29,7 @@ const SideBar = (props) => {
       <div className="m-t-20 d-none d-lg-block">
         <br />
         {events.length > 0
-          ? events.map((event, index) => (
+          ? events.map((event) => (
               <div
                 key={event._id}
                 className={`external-event ${event.bgColor}`}
@@ -39,6 +44,7 @@ const SideBar = (props) => {
                     boardgames: event.boardgames,
                     owner: event.owner,
                     bgColor: event.bgColor,
+                    tempBoardgame: event.tempBoardgame || "",
                   })
                 }
                 data-toggle="modal"

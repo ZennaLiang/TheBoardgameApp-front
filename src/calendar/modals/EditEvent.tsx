@@ -1,12 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
 import EventForm from "./EventForm";
 import { isAuthenticated } from "../../auth";
-import { EventContext } from "../../context/EventContext";
+import { useEvents } from "../../context/EventContext";
 
-const EditEvent = (props) => {
-  const { selectedEvent, setSelectedEvent } = useContext(EventContext);
+const EditEvent: React.FC = () => {
+  const { selectedEvent, setSelectedEvent } = useEvents();
 
   const reset = () => {
     setSelectedEvent({
@@ -19,6 +19,7 @@ const EditEvent = (props) => {
       owner: isAuthenticated().user._id,
       bgColor: "eventTag-Blue",
       boardgames: [],
+      tempBoardgame: "",
     });
   };
 

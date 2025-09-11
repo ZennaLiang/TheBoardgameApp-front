@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
 import TradeDeck from "./TradeDeck";
@@ -11,52 +11,80 @@ import { faSearch, faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
 import { FormGroup, Input, InputGroupText, Alert } from "reactstrap";
 import { Link } from "react-router-dom";
 
-class TradeRequestContainer extends React.Component {
-  constructor(props) {
-    super(props);
+interface TradeData {
+  userID: string;
+  userTradeList: any[];
+  userTotalPrice: number;
+  searchedUserID: string;
+  searchedUser: string;
+  searchedUserTotalPrice: number;
+  searchedUserTradeList: any[];
+  notes: string;
+}
 
-    this.state = {
-      redirectToHome: false,
-      foundUser: false,
-      selectGameAlert: false,
-      selectGameMsg: "",
-      isLoading: true,
-      valueMin: 0,
-      valueMax: 9999,
-      userBoardgames: [],
-      searchedUserBoardgames: [],
-      price: 0,
-      searchedUserPrice: 0,
-      show: false,
-      tradeData: {
-        userID: "",
-        userTradeList: [],
-        userTotalPrice: 0,
-        searchedUserID: "",
-        searchedUser: "",
-        searchedUserTotalPrice: 0,
-        searchedUserTradeList: [],
-        notes: ""
-      }
-    };
-    this.baseTradeData = this.tradeData;
-    this.baseState = this.state;
-  }
+const TradeRequestContainer: React.FC = () => {
+  const [redirectToHome, setRedirectToHome] = useState(false);
+  const [foundUser, setFoundUser] = useState(false);
+  const [selectGameAlert, setSelectGameAlert] = useState(false);
+  const [selectGameMsg, setSelectGameMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [valueMin, setValueMin] = useState(0);
+  const [valueMax, setValueMax] = useState(9999);
+  const [userBoardgames, setUserBoardgames] = useState<any[]>([]);
+  const [searchedUserBoardgames, setSearchedUserBoardgames] = useState<any[]>([]);
+  const [price, setPrice] = useState(0);
+  const [searchedUserPrice, setSearchedUserPrice] = useState(0);
+  const [show, setShow] = useState(false);
+  const [tradeData, setTradeData] = useState<TradeData>({
+    userID: "",
+    userTradeList: [],
+    userTotalPrice: 0,
+    searchedUserID: "",
+    searchedUser: "",
+    searchedUserTotalPrice: 0,
+    searchedUserTradeList: [],
+    notes: ""
+  });
 
-  async loadUserBoardgameData(user) {
-    await getUserId(user)
-      .then(id => {
-        getGuruCollection(id, isAuthenticated().token).then(bgList => {
-          let filteredBgList = bgList.filter(bg => bg.forTrade === true);
-          this.setState({ userBoardgames: filteredBgList, isLoading: false });
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
+  const baseTradeData = useRef({
+    userID: "",
+    userTradeList: [],
+    userTotalPrice: 0,
+    searchedUserID: "",
+    searchedUser: "",
+    searchedUserTotalPrice: 0,
+    searchedUserTradeList: [],
+    notes: ""
+  });
+  
+  const baseState = useRef({
+    redirectToHome: false,
+    foundUser: false,
+    selectGameAlert: false,
+    selectGameMsg: "",
+    isLoading: true,
+    valueMin: 0,
+    valueMax: 9999,
+    userBoardgames: [],
+    searchedUserBoardgames: [],
+    price: 0,
+    searchedUserPrice: 0,
+    show: false
+  });
 
-  listsExists = () => {
+  const loadUserBoardgameData = async (user: string) => {
+    try {
+      const id = await getUserId(user);
+      const bgList = await getGuruCollection(id, isAuthenticated().token);
+      const filteredBgList = bgList.filter(bg => bg.forTrade === true);
+      setUserBoardgames(filteredBgList);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const listsExists = () => {
     console.log(sessionStorage.getItem("myList"));
     if (
       JSON.parse(sessionStorage.getItem("myList")) === null ||
@@ -70,266 +98,267 @@ class TradeRequestContainer extends React.Component {
     }
   };
 
-  showModal = e => {
-    if (this.listsExists) {
+  const showModal = () => {
+    if (listsExists()) {
       console.log("tradeData ISNULL");
-      this.setState(prevState => ({
-        tradeData: {
-          ...prevState.tradeData,
-          userTradeList: [],
-          searchedUserTradeList: []
-        }
+      setTradeData(prevState => ({
+        ...prevState,
+        userTradeList: [],
+        searchedUserTradeList: []
       }));
     } else {
-      this.setState(prevState => ({
-        show: !this.state.show,
-        tradeData: {
-          ...prevState.tradeData,
-          userTradeList: JSON.parse(sessionStorage.getItem("myList")),
-          searchedUserTradeList: JSON.parse(
-            sessionStorage.getItem("searchedUserList")
-          )
-        }
-      }));
-    }
-    this.setState(prevState => ({
-      show: !this.state.show,
-      tradeData: {
-        ...prevState.tradeData,
+      setShow(!show);
+      setTradeData(prevState => ({
+        ...prevState,
         userTradeList: JSON.parse(sessionStorage.getItem("myList")),
         searchedUserTradeList: JSON.parse(
           sessionStorage.getItem("searchedUserList")
         )
-      }
+      }));
+    }
+    setShow(!show);
+    setTradeData(prevState => ({
+      ...prevState,
+      userTradeList: JSON.parse(sessionStorage.getItem("myList")),
+      searchedUserTradeList: JSON.parse(
+        sessionStorage.getItem("searchedUserList")
+      )
     }));
-    console.log(this.state.tradeData);
+    console.log(tradeData);
   };
 
-  loadSearchedUserBoardgameData(user) {
+  const loadSearchedUserBoardgameData = async (user: string) => {
     //load logged in user's boardgames
-    this.clear();
-    this.loadUserBoardgameData(isAuthenticated().user.name);
-    this.setState(prevState => ({
-      tradeData: { ...prevState.tradeData, userID: isAuthenticated().user._id }
+    clear();
+    await loadUserBoardgameData(isAuthenticated().user.name);
+    setTradeData(prevState => ({
+      ...prevState,
+      userID: isAuthenticated().user._id
     }));
 
-    getUserId(user)
-      .then(id => {
-        if (!id || user === isAuthenticated().user.name) {
-          document.getElementById("searchbar").classList.add("is-invalid");
-        } else {
-          getGuruCollection(id, isAuthenticated().token).then(bgList => {
-            try {
-              let filteredBgList = bgList.filter(bg => bg.forTrade === true);
-              this.setState(prevState => ({
-                tradeData: {
-                  ...prevState.tradeData,
-                  searchedUserID: id,
-                  searchedUser: user
-                },
-                searchedUserBoardgames: filteredBgList,
-                isLoading: false,
-                foundUser: true
-              }));
-            } catch (e) {
-              console.log(e);
-            }
-          });
+    try {
+      const id = await getUserId(user);
+      if (!id || user === isAuthenticated().user.name) {
+        const searchbar = document.getElementById("searchbar");
+        searchbar?.classList.add("is-invalid");
+      } else {
+        const bgList = await getGuruCollection(id, isAuthenticated().token);
+        try {
+          const filteredBgList = bgList.filter(bg => bg.forTrade === true);
+          setTradeData(prevState => ({
+            ...prevState,
+            searchedUserID: id,
+            searchedUser: user
+          }));
+          setSearchedUserBoardgames(filteredBgList);
+          setIsLoading(false);
+          setFoundUser(true);
+        } catch (e) {
+          console.log(e);
         }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
-  onChangeSearchBar = () => {
-    document.getElementById("searchbar").classList.remove("is-invalid");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  handleSearchButton(event) {
-    var inputValue = document.getElementById("searchbar").value;
-    this.loadSearchedUserBoardgameData(inputValue);
+  const onChangeSearchBar = () => {
+    const searchbar = document.getElementById("searchbar");
+    searchbar?.classList.remove("is-invalid");
+  };
+
+  const handleSearchButton = () => {
+    const searchbar = document.getElementById("searchbar") as HTMLInputElement;
+    const inputValue = searchbar.value;
+    loadSearchedUserBoardgameData(inputValue);
     sessionStorage.removeItem("myList");
     sessionStorage.removeItem("searchedUserList");
-  }
-  handleEnterKey(e) {
-    let val = e.target.value;
+  };
+
+  const handleEnterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const val = e.currentTarget.value;
     if (e.key === "Enter" && val.trim().length > 0) {
-      var inputValue = document.getElementById("searchbar").value;
-      this.loadSearchedUserBoardgameData(inputValue);
+      const searchbar = document.getElementById("searchbar") as HTMLInputElement;
+      const inputValue = searchbar.value;
+      loadSearchedUserBoardgameData(inputValue);
     }
-  }
+  };
 
   //handles price change up till the decimal, extra validation toFixed(2) is used to round decimals to 2 digits.
-  handlePriceChange(event) {
+  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let { value, min, max } = event.target;
-    value = Math.max(Number(min), Math.min(Number(max), Number(value)));
-    this.setState({ price: value });
-  }
-  handleSearchedUserPriceChange(event) {
-    let { value, min, max } = event.target;
-    value = Math.max(Number(min), Math.min(Number(max), Number(value)));
-    this.setState({ searchedUserPrice: value });
-  }
+    const numValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    setPrice(numValue);
+  };
 
-  clear = () => {
-    this.setState(this.baseState);
-    this.setState(prevState => ({
-      tradeData: {
-        ...prevState.tradeData,
-        searchedUserTradeList: [],
-        userTradeList: [],
-        searchedUserTotalPrice: 0,
-        userTotalPrice: 0
-      }
+  const handleSearchedUserPriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let { value, min, max } = event.target;
+    const numValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    setSearchedUserPrice(numValue);
+  };
+
+  const clear = () => {
+    setRedirectToHome(baseState.current.redirectToHome);
+    setFoundUser(baseState.current.foundUser);
+    setSelectGameAlert(baseState.current.selectGameAlert);
+    setSelectGameMsg(baseState.current.selectGameMsg);
+    setIsLoading(baseState.current.isLoading);
+    setValueMin(baseState.current.valueMin);
+    setValueMax(baseState.current.valueMax);
+    setUserBoardgames(baseState.current.userBoardgames);
+    setSearchedUserBoardgames(baseState.current.searchedUserBoardgames);
+    setPrice(baseState.current.price);
+    setSearchedUserPrice(baseState.current.searchedUserPrice);
+    setShow(baseState.current.show);
+    
+    setTradeData(prevState => ({
+      ...prevState,
+      searchedUserTradeList: [],
+      userTradeList: [],
+      searchedUserTotalPrice: 0,
+      userTotalPrice: 0
     }));
   };
 
-  render() {
-    return (
-      <div className="container-fluid">
-        <div className="row my-3 justify-content-center">
-          {/* BgSidebar is col-sm-3 */}
-          <TradesSideBar />
-          <div className="col-sm-9 col-md-9 col-lg-9">
-            <div className="row">
-              <div className="col-12 px-0">
-                <h4>Make a Trade</h4>
-              </div>
-
-              <div className=" col-12 form-inline py-2 px-0">
-                <FormGroup className="col-12">
-                  <Input
-                    id="searchbar"
-                    onChange={this.onChangeSearchBar}
-                    placeholder="Search..."
-                    onKeyUp={e => {
-                      this.handleEnterKey(e);
-                    }}
-                  />
-                  <InputGroupText>
-                    <Button
-                      variant="primary"
-                      className="rounded"
-                      onClick={this.handleSearchButton.bind(this)}
-                    >
-                      <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
-                    </Button>
-                  </InputGroupText>
-                  &nbsp;
-                  <Input
-                    id="clear"
-                    type="button"
-                    className="btn btn-info rounded block"
-                    onClick={this.clear.bind(this)}
-                    value="Clear"
-                  />
-                  <div className="invalid-feedback">
-                    User entered is not valid.
-                  </div>
-                </FormGroup>
-              </div>
+  return (
+    <div className="container-fluid">
+      <div className="row my-3 justify-content-center">
+        {/* BgSidebar is col-sm-3 */}
+        <TradesSideBar />
+        <div className="col-sm-9 col-md-9 col-lg-9">
+          <div className="row">
+            <div className="col-12 px-0">
+              <h4>Make a Trade</h4>
             </div>
-            {/* START Recipient trade list */}
-            {!this.state.foundUser ? (
-              <div className="row">
-                <div className="col-6"></div>
-              </div>
-            ) : (
-              <div>
-                <div className="text-info">
-                  ***Lists will only show games you have set to wantToTrade in
-                  BoardgameGeek***
+
+            <div className=" col-12 form-inline py-2 px-0">
+              <FormGroup className="col-12">
+                <Input
+                  id="searchbar"
+                  onChange={onChangeSearchBar}
+                  placeholder="Search..."
+                  onKeyUp={handleEnterKey}
+                />
+                <InputGroupText>
+                  <Button
+                    variant="primary"
+                    className="rounded"
+                    onClick={handleSearchButton}
+                  >
+                    <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
+                  </Button>
+                </InputGroupText>
+                &nbsp;
+                <Input
+                  id="clear"
+                  type="button"
+                  className="btn btn-info rounded block"
+                  onClick={clear}
+                  value="Clear"
+                />
+                <div className="invalid-feedback">
+                  User entered is not valid.
                 </div>
-                <div className="row bg-white">
-                  {this.state.selectGameAlert ? (
-                    <div className="col-12 px-0">
-                      <Alert color="warning">{this.state.selectGameMsg}</Alert>
-                    </div>
-                  ) : null}
-
-                  <div className="col-6">
-                    <div className="col-12">
-                      <h3>Your List ({this.state.userBoardgames.length})</h3>
-                    </div>
-                    <br />
-                    <div className="col-12 form-group ">
-                      <div className="form-group">
-                        <TradeDeck
-                          bgData={this.state.userBoardgames}
-                          listID="myList"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {this.state.searchedUserBoardgames.length > 0 ? (
-                    <div className="col-6">
-                      <Link to={`/user/${this.state.tradeData.searchedUserID}`}>
-                        <h3>
-                          {this.state.tradeData.searchedUser
-                            .charAt(0)
-                            .toUpperCase() +
-                            this.state.tradeData.searchedUser.slice(1)}
-                          's List ({this.state.searchedUserBoardgames.length})
-                        </h3>
-                      </Link>
-
-                      <br />
-                      <div className="col-12 form-group">
-                        <TradeDeck
-                          bgData={this.state.searchedUserBoardgames}
-                          listID="searchedUserList"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <h3>
-                        <Link
-                          to={`/user/${this.state.tradeData.searchedUserID}`}
-                        >
-                          {this.state.tradeData.searchedUser
-                            .charAt(0)
-                            .toUpperCase() +
-                            this.state.tradeData.searchedUser.slice(1)}
-                        </Link>{" "}
-                        does not have any games for trade.
-                      </h3>
-                    </div>
-                  )}
-                </div>
-
-                <div className="row bg-dark p-3">
-                  <div className="offset-5">
-                    <button
-                      id="reviewTradeButton"
-                      className="btn btn-success disabled"
-                      onClick={e => {
-                        this.showModal();
-                      }}
-                    >
-                      Review Trade
-                      <br />
-                      <FontAwesomeIcon
-                        size="lg"
-                        icon={faExchangeAlt}
-                      ></FontAwesomeIcon>
-                    </button>
-                  </div>
-                </div>
-                <ConfirmRequestModal
-                  tradeData={
-                    this.state.tradeData !== null ? this.state.tradeData : []
-                  }
-                  onClose={this.showModal}
-                  show={this.state.show}
-                ></ConfirmRequestModal>
-              </div>
-            )}
+              </FormGroup>
+            </div>
           </div>
+          {/* START Recipient trade list */}
+          {!foundUser ? (
+            <div className="row">
+              <div className="col-6"></div>
+            </div>
+          ) : (
+            <div>
+              <div className="text-info">
+                ***Lists will only show games you have set to wantToTrade in
+                BoardgameGeek***
+              </div>
+              <div className="row bg-white">
+                {selectGameAlert ? (
+                  <div className="col-12 px-0">
+                    <Alert color="warning">{selectGameMsg}</Alert>
+                  </div>
+                ) : null}
+
+                <div className="col-6">
+                  <div className="col-12">
+                    <h3>Your List ({userBoardgames.length})</h3>
+                  </div>
+                  <br />
+                  <div className="col-12 form-group ">
+                    <div className="form-group">
+                      <TradeDeck
+                        bgData={userBoardgames}
+                        listID="myList"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {searchedUserBoardgames.length > 0 ? (
+                  <div className="col-6">
+                    <Link to={`/user/${tradeData.searchedUserID}`}>
+                      <h3>
+                        {tradeData.searchedUser
+                          .charAt(0)
+                          .toUpperCase() +
+                          tradeData.searchedUser.slice(1)}
+                        's List ({searchedUserBoardgames.length})
+                      </h3>
+                    </Link>
+
+                    <br />
+                    <div className="col-12 form-group">
+                      <TradeDeck
+                        bgData={searchedUserBoardgames}
+                        listID="searchedUserList"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <h3>
+                      <Link
+                        to={`/user/${tradeData.searchedUserID}`}
+                      >
+                        {tradeData.searchedUser
+                          .charAt(0)
+                          .toUpperCase() +
+                          tradeData.searchedUser.slice(1)}
+                      </Link>{" "}
+                      does not have any games for trade.
+                    </h3>
+                  </div>
+                )}
+              </div>
+
+              <div className="row bg-dark p-3">
+                <div className="offset-5">
+                  <button
+                    id="reviewTradeButton"
+                    className="btn btn-success disabled"
+                    onClick={showModal}
+                  >
+                    Review Trade
+                    <br />
+                    <FontAwesomeIcon
+                      size="lg"
+                      icon={faExchangeAlt}
+                    ></FontAwesomeIcon>
+                  </button>
+                </div>
+              </div>
+              <ConfirmRequestModal
+                tradeData={tradeData}
+                onClose={showModal}
+                show={show}
+              ></ConfirmRequestModal>
+            </div>
+          )}
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
 export default TradeRequestContainer;

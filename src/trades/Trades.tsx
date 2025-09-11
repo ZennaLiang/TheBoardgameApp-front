@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
 import TradeRequest from "./TradeRequest";
@@ -10,173 +10,162 @@ import {
   updateTradeStatus
 } from "./apiTrade";
 import Animator from "../animator/Animator";
-class Trades extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      redirectToHome: false,
-      tradeResponses: [],
-      tradeRequests: [],
-      tradePending: [],
-      isLoading: true
-    };
-  }
 
-  componentWillMount() {
-    let userId = isAuthenticated().user._id;
-    getAllTradeRequestsById(userId).then(data => {
-      if (data) {
-        console.log(data);
-        let outgoingRequests = data.filter(
-          trade =>
-            userId === trade.tradeSender._id &&
-            trade.status !== "Pending" &&
-            trade.status !== "Closed"
-        );
-        let incomingRequests = data.filter(
-          trade =>
-            userId === trade.tradeReceiver._id &&
-            trade.status !== "Pending" &&
-            trade.status !== "Closed"
-        );
-        let pendingRequests = data.filter(trade => trade.status === "Pending");
-        this.setState({
-          tradeResponses: incomingRequests,
-          tradeRequests: outgoingRequests,
-          tradePending: pendingRequests,
-          isLoading: false
-        });
-      } else {
-        this.setState({ isLoading: false });
+interface TradesProps {
+  userId: string;
+}
+
+const Trades: React.FC<TradesProps> = ({ userId }) => {
+  const [redirectToHome, setRedirectToHome] = useState(false);
+  const [tradeResponses, setTradeResponses] = useState<any[]>([]);
+  const [tradeRequests, setTradeRequests] = useState<any[]>([]);
+  const [tradePending, setTradePending] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrades = async () => {
+      const userId = isAuthenticated().user._id;
+      try {
+        const data = await getAllTradeRequestsById(userId);
+        if (data) {
+          console.log(data);
+          const outgoingRequests = data.filter(
+            (trade: any) =>
+              userId === trade.tradeSender._id &&
+              trade.status !== "Pending" &&
+              trade.status !== "Closed"
+          );
+          const incomingRequests = data.filter(
+            (trade: any) =>
+              userId === trade.tradeReceiver._id &&
+              trade.status !== "Pending" &&
+              trade.status !== "Closed"
+          );
+          const pendingRequests = data.filter((trade: any) => trade.status === "Pending");
+          setTradeResponses(incomingRequests);
+          setTradeRequests(outgoingRequests);
+          setTradePending(pendingRequests);
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
       }
-    });
-  }
+    };
 
-  componentDidMount() {
+    fetchTrades();
+  }, []);
+
+  useEffect(() => {
     if (
-      isAuthenticated()._id !== this.props.userId &&
+      isAuthenticated()._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
-      this.setState({ redirectToHome: true });
+      setRedirectToHome(true);
     } else {
       Animator.animate();
     }
-  }
+  }, [userId]);
 
-  onClickRemoveTrade = tradeId => {
+  const onClickRemoveTrade = async (tradeId: string) => {
     const token = isAuthenticated().token;
     try {
-      deleteTrade(token, tradeId).then(data => {
-        if (data.error) {
-          console.log(data.error);
-        }
-      });
-      let newList = this.state.tradeRequests.filter(
-        request => request._id !== tradeId
-      );
-      this.setState({ tradeRequests: newList });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  onClickRejectTrade = tradeId => {
-    const token = isAuthenticated().token;
-    try {
-      updateTradeStatus(token, tradeId, "Closed").then(data => {
-        if (data.error) {
-          console.log(data.error);
-        } else {
-          console.log(data);
-        }
-      });
-      let newList = this.state.tradeRequests.filter(
-        request => request._id !== tradeId
-      );
-      this.setState({ tradePending: newList });
+      const data = await deleteTrade(token, tradeId);
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        setTradeRequests(prev => prev.filter(request => request._id !== tradeId));
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  onClickCompleteTrade = tradeId => {
+  const onClickRejectTrade = async (tradeId: string) => {
     const token = isAuthenticated().token;
     try {
-      updateTradeStatus(token, tradeId, "Complete").then(data => {
-        if (data.error) {
-          console.log(data.error);
-        } else {
-          console.log(data);
-        }
-      });
-      let newList = this.state.tradeRequests.filter(
-        request => request._id !== tradeId
-      );
-      this.setState({ tradePending: newList });
+      const data = await updateTradeStatus(token, tradeId, "Closed");
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        console.log(data);
+        setTradePending(prev => prev.filter(request => request._id !== tradeId));
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  onClickAcceptTrade = tradeId => {
+  const onClickCompleteTrade = async (tradeId: string) => {
     const token = isAuthenticated().token;
     try {
-      updateTradeStatus(token, tradeId, "Pending").then(data => {
-        if (data.error) {
-          console.log(data.error);
-        } else {
-          console.log(data);
-        }
-      });
-      let newList = this.state.tradeRequests.filter(
-        request => request._id !== tradeId
-      );
-      this.setState({ tradePending: newList });
+      const data = await updateTradeStatus(token, tradeId, "Complete");
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        console.log(data);
+        setTradePending(prev => prev.filter(request => request._id !== tradeId));
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  render() {
-    const { redirectToHome } = this.state;
-    if (redirectToHome) return <Navigate to="/" />;
+  const onClickAcceptTrade = async (tradeId: string) => {
+    const token = isAuthenticated().token;
+    try {
+      const data = await updateTradeStatus(token, tradeId, "Pending");
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        console.log(data);
+        setTradePending(prev => prev.filter(request => request._id !== tradeId));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    return (
-      <div className="container-fluid">
-        <div className="row my-3 justify-content-center">
-          {/* BgSidebar is col-sm-3 */}
-          <TradesSideBar highlight="Trades" />
-          <div className="col-sm-6 col-lg-6 animator">
-            <h4>Active Trades</h4>
-            {this.state.isLoading ? (
-              "Loading..."
-            ) : (
-              <div>
-                <TradeRequest
-                  trades={this.state.tradeRequests}
-                  onClickDelete={this.onClickRemoveTrade.bind(this)}
-                  header="Waiting for Response"
-                  deleteText="Remove"
-                />
-                <br />
-                <TradeRequest
-                  trades={this.state.tradeResponses}
-                  onClickAccept={this.onClickAcceptTrade.bind(this)}
-                  onClickDelete={this.onClickRejectTrade.bind(this)}
-                  header="Response Needed"
-                  deleteText="Reject"
-                  successButton="Accept"
-                />
-                <br />
-                <TradePending
-                  trades={this.state.tradePending}
-                  onClickComplete={this.onClickCompleteTrade.bind(this)}
-                />
-              </div>
-            )}
-          </div>
+  if (redirectToHome) return <Navigate to="/" />;
+
+  return (
+    <div className="container-fluid">
+      <div className="row my-3 justify-content-center">
+        {/* BgSidebar is col-sm-3 */}
+        <TradesSideBar highlight="Trades" />
+        <div className="col-sm-6 col-lg-6 animator">
+          <h4>Active Trades</h4>
+          {isLoading ? (
+            "Loading..."
+          ) : (
+            <div>
+              <TradeRequest
+                trades={tradeRequests}
+                onClickDelete={onClickRemoveTrade}
+                header="Waiting for Response"
+                deleteText="Remove"
+              />
+              <br />
+              <TradeRequest
+                trades={tradeResponses}
+                onClickAccept={onClickAcceptTrade}
+                onClickDelete={onClickRejectTrade}
+                header="Response Needed"
+                deleteText="Reject"
+                successButton="Accept"
+              />
+              <br />
+              <TradePending
+                trades={tradePending}
+                onClickComplete={onClickCompleteTrade}
+              />
+            </div>
+          )}
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 export default Trades;

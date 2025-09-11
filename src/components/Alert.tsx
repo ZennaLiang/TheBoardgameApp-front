@@ -28,36 +28,41 @@ const [alertVisible, setAlertVible] = useState(false);
 const [alertRedirect, setAlertRedirect] = useState("");
 const [alertRedirectTxt, setAlertRedirectTxt] = useState("");
 **********************************************************************/
-class Alert extends React.Component<AlertProps> {
-  render() {
-    if (this.props.visible === true) {
-      return (
-        <div className="row stickyAlert">
-          <div className="container-fluid">
-            <div
-              className={
-                "col-12 alert alert-" +
-                this.props.type +
-                (this.props.className ? " " + this.props.className : "")
-              }
-              role="alert"
-            >
-              {this.props.message}
-              {this.props.redirectTo !== undefined &&
-                this.props.redirectTxt !== undefined && (
-                  <Link to={this.props.redirectTo}>
-                    {this.props.redirectTxt}.
-                  </Link>
-                )}
-            
-            </div>
+const Alert: React.FC<AlertProps> = ({ 
+  type, 
+  message, 
+  visible, 
+  redirectTo, 
+  redirectTxt, 
+  className 
+}) => {
+  if (visible === true) {
+    return (
+      <div className="row stickyAlert">
+        <div className="container-fluid">
+          <div
+            className={
+              "col-12 alert alert-" +
+              type +
+              (className ? " " + className : "")
+            }
+            role="alert"
+          >
+            {message}
+            {redirectTo !== undefined &&
+              redirectTxt !== undefined && (
+                <Link to={redirectTo}>
+                  {redirectTxt}.
+                </Link>
+              )}
+          
           </div>
         </div>
-      );
-    } else {
-      return null;
-    }
+      </div>
+    );
+  } else {
+    return null;
   }
-}
+};
 
 export default Alert;
