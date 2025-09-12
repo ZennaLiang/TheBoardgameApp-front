@@ -1,37 +1,23 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
-import Badge from "@material-ui/core/Badge";
+import { styled } from "@mui/material/styles";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Badge from "@mui/material/Badge";
+import Box from "@mui/material/Box";
 
-const useStyles = makeStyles({
-  root: {
-    minWidth: 275,
-    padding: "8px",
-    marginBottom: "4px"
-  },
-  bullet: {
-    display: "inline-block",
-    margin: "0 2px",
-    transform: "scale(0.8)"
-  },
-  title: {
-    fontSize: 14
-  },
-  pos: {
-    marginBottom: 6
-  },
-  hoverStyle: {
+const StyledCard = styled(Card)(({ theme }) => ({
+  minWidth: 275,
+  padding: "8px",
+  marginBottom: "4px",
+  "&:hover": {
     opacity: 0.4,
     cursor: "pointer"
   }
-});
+}));
 
-export default function SimpleCard(props) {
-  const [inHover, setHover] = React.useState(false);
+export default function SimpleCard(props: any) {
   const [clicked, setClicked] = React.useState(props.isRead);
-  const classes = useStyles();
 
   const handleClicked = () => {
     props.handleClickCard();
@@ -39,12 +25,7 @@ export default function SimpleCard(props) {
   };
 
   return (
-    <Card
-      className={`${classes.root} ${inHover && classes.hoverStyle}`}
-      onClick={handleClicked}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
+    <StyledCard onClick={handleClicked}>
       <CardContent>
         <Typography variant="h5" component="h3">
           {props.name}
@@ -53,11 +34,11 @@ export default function SimpleCard(props) {
           <Badge className="float-right" color="secondary" variant="dot" />
         )}
 
-        <Typography className={classes.pos} color="textSecondary">
+        <Typography sx={{ marginBottom: 0.75 }} color="textSecondary">
           {props.nType}
         </Typography>
       </CardContent>
       <hr className="solid my-0" />
-    </Card>
+    </StyledCard>
   );
 }

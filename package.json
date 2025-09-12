@@ -25,6 +25,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@mui/icons-material": "^7.3.2",
     "@mui/lab": "^7.0.0-beta.14",
     "@mui/material": "^7.2.0",
     "axios": "^1.10.0",
@@ -83,6 +84,8 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.0",
     "@types/jest": "^27.5.2",
     "@types/jquery": "^3.5.33",
     "@types/match-sorter": "^5.0.0",
@@ -93,9 +96,13 @@
     "@types/react-modal": "^3.16.3",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-table": "^7.7.20",
+    "@types/react-test-renderer": "^19.1.0",
     "@types/xml2js": "^0.4.14",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-jest": "^30.0.4",
+    "enzyme": "^3.11.0",
     "gh-pages": "^6.3.0",
+    "react-test-renderer": "^18.3.1",
     "typescript": "^4.9.5"
   }
 }

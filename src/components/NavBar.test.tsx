@@ -2,7 +2,7 @@ import React from "react";
 import NavBar from "./NavBar";
 import { BrowserRouter, NavLink } from "react-router-dom";
 import { shallow, mount } from "enzyme";
-import { render, screen } from "@testing-library/dom";
+import { render, screen } from "@testing-library/react";
 import "../../setupTests";
 
 const links = [

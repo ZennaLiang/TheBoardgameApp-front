@@ -1,22 +1,12 @@
 import React, { useState } from "react";
-import { styled } from "@mui/material/styles";
+import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
 
 import { Link } from "react-router-dom";
 import { isAuthenticated } from "../auth";
 import { getUser } from "../user/apiUser";
 
-const useStyles = styled((theme) => ({
-  root: {
-    width: "100%",
-    "& > * + *": {
-      marginTop: theme.spacing(2),
-    },
-  },
-}));
-
 export default function GettingstartedAlert() {
-  const classes = useStyles();
 
   const [hasSynced, setSync] = useState(false);
   if (isAuthenticated()) {
@@ -31,7 +21,7 @@ export default function GettingstartedAlert() {
     );
 
     return (
-      <div className={classes.root}>
+      <Box sx={{ width: "100%", "& > * + *": { marginTop: 2 } }}>
         {!hasSynced ? (
           <Alert severity="info" color="info">
             <Link
@@ -43,7 +33,7 @@ export default function GettingstartedAlert() {
             by syncing your BoardGameGeeks Account.
           </Alert>
         ) : null}
-      </div>
+      </Box>
     );
   } else {
     return null;

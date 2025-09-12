@@ -75,8 +75,7 @@ const NavBar: React.FC = () => {
                 <ul className="navbar-nav mr-auto">
                   <li className="nav-item ">
                     <NavLink
-                      className="nav-link"
-                      activeClassName="selected"
+                      className={({ isActive }) => isActive ? "nav-link selected" : "nav-link"}
                       to={`/user/${isAuthenticated().user._id}`}
                     >{`${Helpers.capitalize(
                       isAuthenticated().user.name
@@ -84,8 +83,7 @@ const NavBar: React.FC = () => {
                   </li>
                   <li className="nav-item ">
                     <NavLink
-                      className="nav-link"
-                      activeClassName="selected"
+                      className={({ isActive }) => isActive ? "nav-link selected" : "nav-link"}
                       to="/posts"
                     >
                       Posts
@@ -94,7 +92,6 @@ const NavBar: React.FC = () => {
                   {/* <li className="nav-item ">
                   <NavLink
                     className="nav-link"
-                    activeClassName="selected"
                     to="/users"
                   >
                     Users
@@ -117,15 +114,13 @@ const NavBar: React.FC = () => {
                       aria-labelledby="navbarDropdownCollectionLink"
                     >
                       <NavLink
-                        className="dropdown-item"
-                        activeClassName="selected"
+                        className={({ isActive }) => isActive ? "dropdown-item selected" : "dropdown-item"}
                         to="/collection/bgguru"
                       >
                         Guru Collection
                       </NavLink>
                       <NavLink
-                        className="dropdown-item"
-                        activeClassName="selected"
+                        className={({ isActive }) => isActive ? "dropdown-item selected" : "dropdown-item"}
                         to="/collection/bgg"
                       >
                         BGGeek Collection
@@ -134,8 +129,7 @@ const NavBar: React.FC = () => {
                   </li>
                   <li className="nav-item ">
                     <NavLink
-                      className="nav-link"
-                      activeClassName="selected"
+                      className={({ isActive }) => isActive ? "nav-link selected" : "nav-link"}
                       to="/trades"
                     >
                       Trades
@@ -144,8 +138,7 @@ const NavBar: React.FC = () => {
                   <li className="nav-item ">
                     {isAuthenticated().user && (
                       <NavLink
-                        className="nav-link"
-                        activeClassName="selected"
+                        className={({ isActive }) => isActive ? "nav-link selected" : "nav-link"}
                         to={`/calendar/${isAuthenticated().user._id}`}
                       >
                         Calendar
@@ -162,8 +155,7 @@ const NavBar: React.FC = () => {
                   <>
                     <li className="nav-item">
                       <NavLink
-                        className="nav-link"
-                        activeClassName="selected"
+                        className={({ isActive }) => isActive ? "nav-link selected" : "nav-link"}
                         to="/signin"
                       >
                         Sign In
@@ -171,8 +163,7 @@ const NavBar: React.FC = () => {
                     </li>
                     <li className="nav-item ">
                       <NavLink
-                        className="nav-link"
-                        activeClassName="selected"
+                        className={({ isActive }) => isActive ? "nav-link selected" : "nav-link"}
                         to="/signup"
                       >
                         Sign Up
@@ -207,8 +198,7 @@ const NavBar: React.FC = () => {
                       >
                         {isAuthenticated().user && (
                           <NavLink
-                            className="dropdown-item"
-                            activeClassName="selected"
+                            className={({ isActive }) => isActive ? "dropdown-item selected" : "dropdown-item"}
                             to={`/user/edit/${isAuthenticated().user._id}`}
                           >
                             Settings
@@ -217,8 +207,7 @@ const NavBar: React.FC = () => {
                         {isAuthenticated() &&
                           isAuthenticated().user.role === "admin" && (
                             <NavLink
-                              className="dropdown-item"
-                              activeClassName="selected"
+                              className={({ isActive }) => isActive ? "dropdown-item selected" : "dropdown-item"}
                               to="/admin"
                             >
                               Admin

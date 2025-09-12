@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { isAuthenticated } from "../auth";
+import { Socket } from "socket.io-client";
 
 import {
   apiInitSocket,
@@ -55,7 +56,7 @@ const Chat: React.FC<ChatProps> = () => {
   
   const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const intervalRef = useRef<NodeJS.Timeout | undefined>();
-  const wsRef = useRef<any>(null);
+  const wsRef = useRef<Socket | null>(null);
 
   const toast = useCallback((message: string, type: string = "danger") => {
     setToastMsg({ type, message });
@@ -150,7 +151,7 @@ const Chat: React.FC<ChatProps> = () => {
 
   const getChats = useCallback((isRefresh = false) => {
     return new Promise((resolve, reject) => {
-      apiGetChats(isAuthenticated().token, isRefresh)
+      apiGetChats(isAuthenticated().token)
         .then(chatsData => {
           if (
             isRefresh &&

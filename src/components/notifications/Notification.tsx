@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import Badge from "@material-ui/core/Badge";
-import IconButton from "@material-ui/core/IconButton";
-import Popover from "@material-ui/core/Popover";
-import NotificationsIcon from "@material-ui/icons/Notifications";
+import Badge from "@mui/material/Badge";
+import IconButton from "@mui/material/IconButton";
+import Popover from "@mui/material/Popover";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import Card from "./Card";
 import { Link } from "react-router-dom";
 //Red notification marker to be fixed with Context is implemented
