@@ -53,7 +53,7 @@ const Signin = props => {
                         resetForm({});
                       } else {
                         authenticate(data, () => {
-                          window.location = "/posts";
+                          window.location.href = "/posts";
                         });
                       }
                     })

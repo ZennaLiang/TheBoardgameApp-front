@@ -56,7 +56,7 @@ const FindPeople: React.FC = () => {
           <div className="card-body">
             <img
               className="img-thunbnail card-img-top "
-              src={`${process.env.REACT_APP_API_URL}/user/photo/${user._id}`}
+              src={`${import.meta.env.VITE_API_URL}/user/photo/${user._id}`}
               onError={(e: any) => (e.target.src = `${DefaultProfileImg}`)}
               alt={user.name}
             />

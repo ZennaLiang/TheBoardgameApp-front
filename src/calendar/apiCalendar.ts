@@ -1,5 +1,5 @@
 export const createEvent = (userId, token, event) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/event/new/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/event/new/${userId}`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -15,7 +15,7 @@ export const createEvent = (userId, token, event) => {
 };
 
 export const getEvent = (eventId) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/event/${eventId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/event/${eventId}`, {
     method: "GET",
   })
     .then((response) => {
@@ -25,7 +25,7 @@ export const getEvent = (eventId) => {
 };
 
 export const getEventsByUserId = (userId, token) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/events/by/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/events/by/${userId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -40,7 +40,7 @@ export const getEventsByUserId = (userId, token) => {
 };
 
 export const removeEvent = (eventId, token) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/event/${eventId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/event/${eventId}`, {
     method: "DELETE",
     headers: {
       Accept: "application/json",
@@ -55,7 +55,7 @@ export const removeEvent = (eventId, token) => {
 };
 
 export const updateEvent = (eventId, token, event) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/event/${eventId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/event/${eventId}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",

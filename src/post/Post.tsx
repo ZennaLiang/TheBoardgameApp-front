@@ -108,7 +108,7 @@ const Post: React.FC<PostProps> = () => {
     return (
       <div className="card-body">
         <img
-          src={`${process.env.REACT_APP_API_URL}/post/photo/${postData._id}`}
+          src={`${import.meta.env.VITE_API_URL}/post/photo/${postData._id}`}
           alt={postData.title}
           onError={(i: any) => (i.target.src = `${DefaultPostImg}`)}
           className="img-thunbnail mb-3"

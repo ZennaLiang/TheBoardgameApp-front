@@ -20,7 +20,7 @@ const TradeHistory: React.FC<TradeHistoryProps> = ({ userId }) => {
     const username = user.name;
     
     if (
-      isAuthenticated()._id !== userId &&
+      isAuthenticated().user._id !== userId &&
       user.role !== "admin"
     ) {
       setRedirectToHome(true);

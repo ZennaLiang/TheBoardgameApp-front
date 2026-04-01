@@ -19,7 +19,7 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ userId }) => {
                 console.log(data.error);
             } else {
                 // if user is not admin then signout
-                if (!isAuthenticated().user.role === "admin") {
+                if (isAuthenticated().user.role !== "admin") {
                     // signout user
                     signout(() => console.log("User is deleted"));
                 }

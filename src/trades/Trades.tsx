@@ -12,7 +12,7 @@ import {
 import Animator from "../animator/Animator";
 
 interface TradesProps {
-  userId: string;
+  userId?: string;
 }
 
 const Trades: React.FC<TradesProps> = ({ userId }) => {
@@ -60,7 +60,8 @@ const Trades: React.FC<TradesProps> = ({ userId }) => {
 
   useEffect(() => {
     if (
-      isAuthenticated()._id !== userId &&
+      userId &&
+      isAuthenticated().user._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
       setRedirectToHome(true);

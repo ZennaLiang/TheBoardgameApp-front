@@ -15,7 +15,7 @@ const BgContainer: React.FC<BgContainerProps> = ({ userId, sidebar, children }) 
   useEffect(() => {
     if (
       userId &&
-      isAuthenticated()._id !== userId &&
+      isAuthenticated().user._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
       setRedirectToHome(true);

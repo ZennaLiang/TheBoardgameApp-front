@@ -61,7 +61,7 @@ const SettingSideBar: React.FC<SettingSideBarProps> = ({ highlight, userId }) =>
           setId(data._id);
           setName(data.name);
           setFile(data._id
-            ? `${process.env.REACT_APP_API_URL}/user/photo/${
+            ? `${import.meta.env.VITE_API_URL}/user/photo/${
                 data._id
               }?${new Date().getTime()}`
             : DefaultProfileImg);
@@ -219,7 +219,7 @@ const SettingSideBar: React.FC<SettingSideBarProps> = ({ highlight, userId }) =>
             src={
               id
                 ? `${
-                    process.env.REACT_APP_API_URL
+                    import.meta.env.VITE_API_URL
                   }/user/photo/${id}?${new Date().getTime()}`
                 : DefaultProfileImg
             }

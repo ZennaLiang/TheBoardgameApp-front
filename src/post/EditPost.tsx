@@ -157,9 +157,9 @@ const EditPost: React.FC = () => {
         style={{ height: "200px", width: "auto" }}
         className="img-thumbnail"
         src={`${
-          process.env.REACT_APP_API_URL
+          import.meta.env.VITE_API_URL
         }/post/photo/${id}?${new Date().getTime()}`}
-        onError={(i) => (i.target.src = `${DefaultPostImg}`)}
+        onError={(i) => ((i.target as HTMLImageElement).src = `${DefaultPostImg}`)}
         alt={title}
       />
 

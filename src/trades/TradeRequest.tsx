@@ -99,7 +99,7 @@ const TradeRequest: React.FC<TradeRequestProps> = ({
                       {trade.tradeReceiver.photo ? (
                         <img
                           className=" float-left rounded-circle avatarSize"
-                          src={`${process.env.REACT_APP_API_URL}/user/photo/${trade.tradeReceiver._id}`}
+                          src={`${import.meta.env.VITE_API_URL}/user/photo/${trade.tradeReceiver._id}`}
                           alt="avatar"
                         />
                       ) : (
@@ -127,7 +127,7 @@ const TradeRequest: React.FC<TradeRequestProps> = ({
                       {trade.tradeSender.photo ? (
                         <img
                           className=" float-left rounded-circle avatarSize"
-                          src={`${process.env.REACT_APP_API_URL}/user/photo/${trade.tradeSender._id}`}
+                          src={`${import.meta.env.VITE_API_URL}/user/photo/${trade.tradeSender._id}`}
                           alt="avatar"
                         />
                       ) : (

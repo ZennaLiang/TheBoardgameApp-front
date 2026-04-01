@@ -1,6 +1,6 @@
 import React from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment";
+import { format } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarCheck,
@@ -16,11 +16,11 @@ const ViewEvent: React.FC = () => {
 
   const formatingDate = () => {
     let formatDate = selectedEvent.allDay ? (
-      <> {moment(selectedEvent.startDate).format("dddd, MMM Do h:mm A")}</>
+      <> {format(new Date(selectedEvent.startDate), "EEEE, MMM do h:mm a")}</>
     ) : (
       <>
-        {moment(selectedEvent.startDate).format("dddd, MMM Do h:mm A")} -{" "}
-        {moment(selectedEvent.endDate).format("h:mm A")}
+        {format(new Date(selectedEvent.startDate), "EEEE, MMM do h:mm a")} -{" "}
+        {format(new Date(selectedEvent.endDate), "h:mm a")}
       </>
     );
     return formatDate;

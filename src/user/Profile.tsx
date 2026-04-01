@@ -86,7 +86,7 @@ const Profile: React.FC = () => {
 
   // use new Date() to update image right away
   const photoUrl = user._id
-    ? `${process.env.REACT_APP_API_URL}/user/photo/${
+    ? `${import.meta.env.VITE_API_URL}/user/photo/${
         user._id
       }?${new Date().getTime()}`
     : DefaultProfileImg;

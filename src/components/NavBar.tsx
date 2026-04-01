@@ -232,7 +232,7 @@ const NavBar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isAuthenticated ? <GettingStartedAlert /> : null}
+        {isAuthenticated() ? <GettingStartedAlert /> : null}
       </div>
     );
 };

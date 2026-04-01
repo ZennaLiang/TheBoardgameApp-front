@@ -1,129 +1,136 @@
-export const signup = user => {
-    // process.env to access REACT_APP backend URL
-    return fetch(`${process.env.REACT_APP_API_URL}/signup`, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(user)
-    })
-        .then(response => {
-            return response.json();
-        })
-        .catch(err => console.log(err));
+const API_URL = import.meta.env.VITE_API_URL;
+
+interface SignupUser {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface SigninUser {
+  email: string;
+  password: string;
+}
+
+interface AuthUser {
+  _id: string;
+  name: string;
+  email: string;
+  role?: string;
+  boardgames?: any[];
+  bggUsername?: string;
+}
+
+export interface AuthData {
+  token: string;
+  user: AuthUser;
+  error?: string;
+}
+
+export const signup = (user: SignupUser): Promise<any> => {
+  return fetch(`${API_URL}/signup`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
 };
 
-export const signin = user => {
-    return fetch(`${process.env.REACT_APP_API_URL}/signin`, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(user)
-    })
-        .then(response => {
-            return response.json();
-        })
-        .catch(err => console.log(err));
+export const signin = (user: SigninUser): Promise<AuthData> => {
+  return fetch(`${API_URL}/signin`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
 };
 
-export const googleLogin = user => {
-    return fetch(`${process.env.REACT_APP_API_URL}/google-login/`, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        // credentials: "include", // works only in the same origin
-        body: JSON.stringify(user)
-    })
-        .then(response => {
-            return response.json();
-        })
-        .catch(err => console.log(err));
+export const googleLogin = (user: { tokenId: string }): Promise<AuthData> => {
+  return fetch(`${API_URL}/google-login/`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
 };
 
-export const facebookLogin = user => {
-    return fetch(`${process.env.REACT_APP_API_URL}/facebook-login/`, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        // credentials: "include", // works only in the same origin
-        body: JSON.stringify(user)
-    })
-        .then(response => {
-            return response.json();
-        })
-        .catch(err => console.log(err));
+export const facebookLogin = (user: { email: string; name: string }): Promise<AuthData> => {
+  return fetch(`${API_URL}/facebook-login/`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
 };
 
-export const authenticate = (jwt, next) => {
-    if (typeof window !== "undefined") {
-        // pass json web token to localStorage 
-        // this allow the user to be authenticated
-        localStorage.setItem("jwt", JSON.stringify(jwt));
-        next();
-    }
-};
-
-export const signout = next => {
-    if (typeof window !== "undefined") localStorage.removeItem("jwt");
+export const authenticate = (jwt: AuthData, next: () => void): void => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("jwt", JSON.stringify(jwt));
     next();
-    return fetch(`${process.env.REACT_APP_API_URL}/signout`, {
-        method: "GET"
-    })
-        .then(response => {
-            //console.log("signout", response);
-            return response.json();
-        })
-        .catch(err => console.log(err));
+  }
 };
 
-export const isAuthenticated = () => {
-    if (typeof window == "undefined") {
-        return false;
-    }
-
-    if (localStorage.getItem("jwt")) {
-        return JSON.parse(localStorage.getItem("jwt"));
-    } else {
-        return false;
-    }
+export const signout = (next: () => void): Promise<any> => {
+  if (typeof window !== "undefined") localStorage.removeItem("jwt");
+  next();
+  return fetch(`${API_URL}/signout`, {
+    method: "GET",
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
 };
 
-export const forgotPasswordReq = email => {
-    //console.log("email: ", email);
-    return fetch(`${process.env.REACT_APP_API_URL}/forgot-password/`, {
-        method: "PUT",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email })
-    })
-        .then(response => {
-            //console.log("forgot password response: ", response);
-            return response.json();
-        })
-        .catch(err => console.log(err));
+export const isAuthenticated = (): AuthData => {
+  if (typeof window === "undefined") {
+    return false as unknown as AuthData;
+  }
+  const item = localStorage.getItem("jwt");
+  if (item) {
+    return JSON.parse(item) as AuthData;
+  }
+  return false as unknown as AuthData;
 };
 
-export const resetPasswordReq = resetInfo => {
-    return fetch(`${process.env.REACT_APP_API_URL}/reset-password/`, {
-        method: "PUT",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(resetInfo)
-    })
-        .then(response => {
-            //console.log("forgot password response: ", response);
-            return response.json();
-        })
-        .catch(err => console.log(err));
+export const forgotPasswordReq = (email: string): Promise<any> => {
+  return fetch(`${API_URL}/forgot-password/`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
+};
+
+export const resetPasswordReq = (resetInfo: {
+  resetPasswordLink: string;
+  newPassword: string;
+}): Promise<any> => {
+  return fetch(`${API_URL}/reset-password/`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(resetInfo),
+  })
+    .then((response) => response.json())
+    .catch((err) => console.log(err));
 };

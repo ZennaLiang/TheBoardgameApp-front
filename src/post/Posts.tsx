@@ -1,4 +1,4 @@
-import { Link, Route } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useRef, useCallback } from "react";
 
 import useFetchMorePosts from "./useFetchMorePosts";
@@ -6,6 +6,7 @@ import Animator from "../animator/Animator";
 import Helpers from "../helpers";
 
 const Posts = () => {
+  const navigate = useNavigate();
   const [pageNumber, setPageNumber] = useState(1);
   const { posts, hasMore, loading, error } = useFetchMorePosts(pageNumber);
   const refObserver = useRef<IntersectionObserver | null>(null);
@@ -42,7 +43,7 @@ const Posts = () => {
       <div className="card animator mb-3">
         {post.photo && (
           <img
-            src={`${process.env.REACT_APP_API_URL}/post/photo/${post._id}`}
+            src={`${import.meta.env.VITE_API_URL}/post/photo/${post._id}`}
             alt={post.title}
             className="img-thumbnail postsImg mx-auto d-block"
           />
@@ -77,28 +78,24 @@ const Posts = () => {
         <div className="card mt-3">
           <h5 className="card-header">Create Post</h5>
           <div className="card-body">
-            <Route
-              render={({ history }) => (
-                <form>
-                  <div className="input-group">
-                    <input
-                      className="form-control"
-                      placeholder="Post some Boardgames! :3"
-                      onFocus={() => {
-                        history.push("/post/create");
-                      }}
-                    />
-                    <div className="input-group-append">
-                      <span className="input-group-text">
-                        <Link to={`/post/create`}>
-                          <i className="fa fa-image text-dark"></i>
-                        </Link>
-                      </span>
-                    </div>
-                  </div>
-                </form>
-              )}
-            />
+            <form>
+              <div className="input-group">
+                <input
+                  className="form-control"
+                  placeholder="Post some Boardgames! :3"
+                  onFocus={() => {
+                    navigate("/post/create");
+                  }}
+                />
+                <div className="input-group-append">
+                  <span className="input-group-text">
+                    <Link to={`/post/create`}>
+                      <i className="fa fa-image text-dark"></i>
+                    </Link>
+                  </span>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>

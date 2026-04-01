@@ -163,7 +163,7 @@ const NewPost: React.FC = () => {
         style={{ height: "200px", width: "auto" }}
         className="img-thumbnail"
         src={file}
-        onError={(i) => (i.target.src = `${DefaultPostImg}`)}
+        onError={(i) => ((i.target as HTMLImageElement).src = `${DefaultPostImg}`)}
         alt={title}
       />
       {newPostForm}

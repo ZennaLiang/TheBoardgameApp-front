@@ -78,7 +78,7 @@ const SocialLogins: React.FC<SocialLoginsProps> = ({ title }) => {
   return (
       <div className="text-center social-btn">
         {/* <GoogleLogin
-          clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+          clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
           onSuccess={responseGoogle}
           onFailure={responseGoogle}
           cookiePolicy={"single_host_origin"}
@@ -96,7 +96,7 @@ const SocialLogins: React.FC<SocialLoginsProps> = ({ title }) => {
         />
 
         <FacebookLogin
-          appId={process.env.REACT_APP_FACEBOOK_APP_ID}
+          appId={import.meta.env.VITE_FACEBOOK_APP_ID}
           fields="id,name,email,picture"
           callback={responseFacebook}
           autoLoad={false}

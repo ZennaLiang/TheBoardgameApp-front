@@ -87,10 +87,8 @@ const TradeRequestContainer: React.FC = () => {
   const listsExists = () => {
     console.log(sessionStorage.getItem("myList"));
     if (
-      JSON.parse(sessionStorage.getItem("myList")) === null ||
-      JSON.parse(sessionStorage.getItem("myList")) === [] ||
-      JSON.parse(sessionStorage.getItem("searchedUserList")) === null ||
-      JSON.parse(sessionStorage.getItem("searchedUserList")) === []
+      sessionStorage.getItem("myList") === null ||
+      sessionStorage.getItem("searchedUserList") === null
     ) {
       return false;
     } else {
@@ -224,7 +222,7 @@ const TradeRequestContainer: React.FC = () => {
     <div className="container-fluid">
       <div className="row my-3 justify-content-center">
         {/* BgSidebar is col-sm-3 */}
-        <TradesSideBar />
+        <TradesSideBar highlight="Trades" />
         <div className="col-sm-9 col-md-9 col-lg-9">
           <div className="row">
             <div className="col-12 px-0">
@@ -290,6 +288,7 @@ const TradeRequestContainer: React.FC = () => {
                       <TradeDeck
                         bgData={userBoardgames}
                         listID="myList"
+                        userId={tradeData.userID}
                       />
                     </div>
                   </div>
@@ -312,6 +311,7 @@ const TradeRequestContainer: React.FC = () => {
                       <TradeDeck
                         bgData={searchedUserBoardgames}
                         listID="searchedUserList"
+                        userId={tradeData.searchedUserID}
                       />
                     </div>
                   </div>

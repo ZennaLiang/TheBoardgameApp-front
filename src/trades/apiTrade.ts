@@ -17,7 +17,7 @@ function replacer(key, value) {
 }
 
 export const createTrade = (token, trade) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/trade/requestTrade`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/trade/requestTrade`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -34,7 +34,7 @@ export const createTrade = (token, trade) => {
 };
 
 export const deleteTrade = (token, tradeId) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/trade/delete/${tradeId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/trade/delete/${tradeId}`, {
     method: "DELETE",
     headers: {
       Accept: "application/json",
@@ -50,7 +50,7 @@ export const deleteTrade = (token, tradeId) => {
 };
 
 export const getAllTradeRequests = () => {
-  return fetch(`${process.env.REACT_APP_API_URL}/trades`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/trades`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -63,7 +63,7 @@ export const getAllTradeRequests = () => {
 };
 
 export const getAllTradeRequestsById = userId => {
-  return fetch(`${process.env.REACT_APP_API_URL}/trades/by/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/trades/by/${userId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -82,7 +82,7 @@ export const getAllTradeRequestsById = userId => {
 };
 
 export const getTradeRequestById = tradeId => {
-  return fetch(`${process.env.REACT_APP_API_URL}/trade/by/${tradeId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/trade/by/${tradeId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -95,7 +95,7 @@ export const getTradeRequestById = tradeId => {
 };
 
 export const updateTradeStatus = (token, tradeId, status) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/trade/update/${tradeId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/trade/update/${tradeId}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",

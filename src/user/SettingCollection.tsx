@@ -86,8 +86,7 @@ const SettingCollection: React.FC = () => {
               setLoading(false);
               setAlertVisible(true);
               setSubmitting(false);
-            },
-            5000
+            }
           );
         });
       }}

@@ -32,11 +32,12 @@ const UserInfoValidation = Yup.object().shape({
       "Password must contain at least 1 lowercase alphabetical character"
     ),
   matchPassword: Yup.string()
-    .when("password", {
-      is: (password) => password !== undefined && password.length > 0,
-      then: Yup.string().required("Please retype password"),
-    })
-    .oneOf([Yup.ref("password"), null], "password doesnt match"),
+    .when("password", ([password], schema) =>
+      password !== undefined && password.length > 0
+        ? schema.required("Please retype password")
+        : schema
+    )
+    .oneOf([Yup.ref("password"), undefined], "password doesnt match"),
 });
 
 const SettingUser: React.FC = () => {

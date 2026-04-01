@@ -12,8 +12,9 @@ export default function useFetchMorePosts(pageNumber) {
     setLoading(true);
     setError(false);
     getPosts(pageNumber).then(data => {
-      setPosts(prevPosts => [...prevPosts, ...data]);
-      setHasMore(data.length > 0);
+      const posts = Array.isArray(data) ? data : [];
+      setPosts(prevPosts => [...prevPosts, ...posts]);
+      setHasMore(posts.length > 0);
       setLoading(false);
     }).catch(e => {
       setError(true);

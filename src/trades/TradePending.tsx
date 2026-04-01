@@ -17,7 +17,7 @@ const TradePending: React.FC<TradePendingProps> = ({
 
   useEffect(() => {
     if (
-      isAuthenticated()._id !== userId &&
+      isAuthenticated().user._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
       setRedirectToHome(true);

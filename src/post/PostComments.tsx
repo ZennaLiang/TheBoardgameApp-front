@@ -125,7 +125,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, comments, updateCom
                                     height="30px"
                                     width="30px"
                                     onError={(i) => ((i.target as HTMLImageElement).src = `${DefaultPostImg}`)}
-                                    src={`${process.env.REACT_APP_API_URL}/user/photo/${comment.postedBy._id}`}
+                                    src={`${import.meta.env.VITE_API_URL}/user/photo/${comment.postedBy._id}`}
                                     alt={comment.postedBy.name}
                                 />
                             </Link>

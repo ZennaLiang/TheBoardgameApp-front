@@ -1,6 +1,6 @@
 export const getUserId = username => {
   return fetch(
-    `${process.env.REACT_APP_API_URL}/user/find/${username.toLowerCase()}`,
+    `${import.meta.env.VITE_API_URL}/user/find/${username.toLowerCase()}`,
     {
       method: "GET"
     }
@@ -16,7 +16,7 @@ export const getUserId = username => {
 };
 
 export const getUser = (userId, token) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/user/${userId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -31,7 +31,7 @@ export const getUser = (userId, token) => {
 };
 
 export const getUsers = () => {
-  return fetch(`${process.env.REACT_APP_API_URL}/users`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/users`, {
     method: "GET"
   })
     .then(response => {
@@ -41,7 +41,7 @@ export const getUsers = () => {
 };
 
 export const removeUser = (userId, token) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/user/${userId}`, {
     method: "DELETE",
     headers: {
       Accept: "application/json",
@@ -56,7 +56,7 @@ export const removeUser = (userId, token) => {
 };
 
 export const updateUser = (userId, token, user) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/user/${userId}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",
@@ -71,7 +71,7 @@ export const updateUser = (userId, token, user) => {
 };
 export const updateBggBoardgamesByUsername = (userId, token, bggUsername) => {
   return fetch(
-    `${process.env.REACT_APP_API_URL}/user/bgg/${bggUsername}&${userId}`,
+    `${import.meta.env.VITE_API_URL}/user/bgg/${bggUsername}&${userId}`,
     {
       method: "PUT",
       headers: {
@@ -100,7 +100,7 @@ export const updateLocalStorUser = (userData, next) => {
 };
 
 export const followUser = (userId, token, followId) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/follow`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/user/follow`, {
     method: "PUT",
     headers: {
       Accept: "application/json",
@@ -116,7 +116,7 @@ export const followUser = (userId, token, followId) => {
 };
 
 export const unfollowUser = (userId, token, unfollowId) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/unfollow`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/user/unfollow`, {
     method: "PUT",
     headers: {
       Accept: "application/json",
@@ -132,7 +132,7 @@ export const unfollowUser = (userId, token, unfollowId) => {
 };
 
 export const findPeople = (userId, token) => {
-  return fetch(`${process.env.REACT_APP_API_URL}/user/findpeople/${userId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/user/findpeople/${userId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",

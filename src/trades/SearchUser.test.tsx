@@ -4,7 +4,7 @@ import SearchUser from "./SearchUser";
 
 describe("<SearchUser />", () => {
   it("render SearchUser", () => {
-    const tree = renderer.create(<SearchUser />).toJSON();
+    const tree = renderer.create(<SearchUser searchValue="" onChangeValue={() => {}} />).toJSON();
 
     expect(tree).toMatchSnapshot();
   });

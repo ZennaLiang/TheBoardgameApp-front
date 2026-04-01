@@ -11,7 +11,7 @@ import {
   apiSendChat,
   apiSearchUser
 } from "./apiChat";
-import moment from "moment";
+import { formatDistanceToNow } from "date-fns";
 
 import DefaultProfileImg from "../images/avatar.png";
 
@@ -54,8 +54,8 @@ const Chat: React.FC<ChatProps> = () => {
   const [userSearchResults, setUserSearchResults] = useState<ChatUser[]>([]);
   const [toastMsg, setToastMsg] = useState<ToastMessage | null>(null);
   
-  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>();
-  const intervalRef = useRef<NodeJS.Timeout | undefined>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const wsRef = useRef<Socket | null>(null);
 
   const toast = useCallback((message: string, type: string = "danger") => {
@@ -83,7 +83,7 @@ const Chat: React.FC<ChatProps> = () => {
 
         intervalRef.current = setInterval(() => {
           getChats(true);
-        }, parseInt(process.env.REACT_APP_CHAT_REFRESH || "60000"));
+        }, parseInt(import.meta.env.VITE_CHAT_REFRESH || "60000"));
 
         ws.on("newMsg", (data: any) => {
           setMuted(currentMuted => {
@@ -435,7 +435,7 @@ const Chat: React.FC<ChatProps> = () => {
                               className="chatProfImg shadow-sm mx-3"
                               alt="Chat Profile"
                               src={`${
-                                process.env.REACT_APP_API_URL
+                                import.meta.env.VITE_API_URL
                               }/user/photo/${
                                 chat.between.filter(
                                   e => e._id !== isAuthenticated().user._id
@@ -456,10 +456,10 @@ const Chat: React.FC<ChatProps> = () => {
                               </h6>
                               <div>
                                 {chat.messages[chat.messages.length - 1] &&
-                                  moment(
-                                    chat.messages[chat.messages.length - 1]
-                                      .timestamp
-                                  ).fromNow()}
+                                  formatDistanceToNow(
+                                    new Date(chat.messages[chat.messages.length - 1].timestamp),
+                                    { addSuffix: true }
+                                  )}
                               </div>
                             </div>
                             {loading === chat._id && (
@@ -491,7 +491,7 @@ const Chat: React.FC<ChatProps> = () => {
                       >
                         <div className="msgText">{msg.message}</div>
                         <div className="msgTime">
-                          {moment(msg.timestamp).fromNow()}
+                          {formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true })}
                         </div>
                       </div>
                     );

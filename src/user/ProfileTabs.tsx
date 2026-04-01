@@ -29,7 +29,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ following, followers, posts }
                         className="float-left mr-2"
                         height="30px"
                         onError={i => ((i.target as HTMLImageElement).src = DefaultProfileImg)}
-                        src={`${process.env.REACT_APP_API_URL}/user/photo/${person._id}`}
+                        src={`${import.meta.env.VITE_API_URL}/user/photo/${person._id}`}
                         alt={person.name}
                       />
                       <div>
@@ -61,7 +61,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ following, followers, posts }
                         height="30px"
                         width="30px"
                         onError={i => ((i.target as HTMLImageElement).src = DefaultProfileImg)}
-                        src={`${process.env.REACT_APP_API_URL}/user/photo/${person._id}`}
+                        src={`${import.meta.env.VITE_API_URL}/user/photo/${person._id}`}
                         alt={person.name}
                       />
 

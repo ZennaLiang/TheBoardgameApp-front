@@ -5,10 +5,19 @@ import Popover from "@mui/material/Popover";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Card from "./Card";
 import { Link } from "react-router-dom";
+
+interface NotificationItem {
+  id: string;
+  link: string;
+  isRead: boolean;
+  name: string;
+  type: string;
+}
+
 //Red notification marker to be fixed with Context is implemented
-export default function Notification(props) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [notifications, setNotifications] = React.useState([{}]);
+export default function Notification(props: any) {
+  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
   const [hasNew, setHasNew] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 

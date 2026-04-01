@@ -33,7 +33,7 @@ const Users: React.FC = () => {
           <Link key={i} to={`/user/${user._id}`}>
             {user.photo ? (
               <img
-                src={`${process.env.REACT_APP_API_URL}/user/photo/${user._id}`}
+                src={`${import.meta.env.VITE_API_URL}/user/photo/${user._id}`}
                 style={{ height: "225px", width: "225px" }}
                 alt={user.name}
                 className="img-thumbnail card-img-top postsImg mx-auto d-block"

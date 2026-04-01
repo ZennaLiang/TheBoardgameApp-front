@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 
-let baseUrl = `${process.env.REACT_APP_API_URL}/chat`;
-let ws = io(process.env.REACT_APP_CHAT_URL as string);
+let baseUrl = `${import.meta.env.VITE_API_URL}/chat`;
+let ws = io(import.meta.env.VITE_CHAT_URL as string);
 
 export const apiInitSocket = (token: string): Promise<Socket> => {
   return new Promise((resolve, reject) => {

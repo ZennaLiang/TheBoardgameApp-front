@@ -33,7 +33,7 @@ const TradeDeck: React.FC<TradeDeckProps> = ({ userId, user, bgData, listID }) =
     };
 
     if (
-      isAuthenticated()._id !== userId &&
+      isAuthenticated().user._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
       setRedirectToHome(true);

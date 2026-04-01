@@ -39,7 +39,7 @@ const TradeSettings: React.FC<TradeSettingsProps> = ({ userId }) => {
 
   useEffect(() => {
     if (
-      isAuthenticated()._id !== userId &&
+      isAuthenticated().user._id !== userId &&
       isAuthenticated().user.role !== "admin"
     ) {
       setRedirectToHome(true);

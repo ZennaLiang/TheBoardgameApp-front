@@ -1,71 +1,49 @@
 {
   "name": "bgapp-front",
-  "jest": {
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}",
-      "!src/index.tsx"
-    ],
-    "coverageReporters": [
-      "text"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/assetsTransformer.ts",
-      "\\.(css|less)$": "<rootDir>/assetsTransformer.ts"
-    }
-  },
   "version": "0.1.0",
   "private": true,
   "homepage": "https://tselouie.github.io/TheBoardgameApp-front",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mui/icons-material": "^7.3.2",
-    "@mui/lab": "^7.0.0-beta.14",
-    "@mui/material": "^7.2.0",
-    "axios": "^1.10.0",
-    "bootstrap": "^5.3.7",
-    "cors-anywhere": "^0.4.4",
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.0",
+    "@mui/icons-material": "^7.3.9",
+    "@mui/lab": "^7.0.1-beta.23",
+    "@mui/material": "^7.3.9",
+    "@tanstack/react-table": "^8.21.3",
+    "axios": "^1.14.0",
+    "bootstrap": "^5.3.8",
     "date-fns": "^4.1.0",
-    "formik": "^2.4.6",
-    "google-auth-library": "^10.1.0",
-    "gsap": "^3.13.0",
+    "formik": "^2.4.9",
+    "google-auth-library": "^10.6.2",
+    "gsap": "^3.14.2",
     "in-view": "^0.6.1",
     "jquery": "^3.7.1",
-    "match-sorter": "^8.0.3",
-    "moment": "^2.30.1",
-    "react": "^18.0.0",
+    "match-sorter": "^8.2.0",
+    "react": "^19.2.4",
     "react-big-calendar": "^1.19.4",
     "react-bootstrap": "^2.10.10",
-    "react-datepicker": "^8.4.0",
-    "react-dom": "^18.0.0",
-    "react-loader-spinner": "^6.1.6",
+    "react-datepicker": "^9.1.0",
+    "react-dom": "^19.2.4",
+    "react-loader-spinner": "^8.0.2",
     "react-modal": "^3.16.3",
-    "react-router-dom": "^7.6.3",
-    "react-scripts": "^5.0.1",
-    "react-select": "^5.10.1",
-    "react-table": "^7.8.0",
+    "react-router-dom": "^7.13.2",
+    "react-select": "^5.10.2",
     "reactstrap": "^9.2.3",
-    "sass": "^1.89.2",
-    "socket.io-client": "^4.8.1",
+    "sass": "^1.98.0",
+    "socket.io-client": "^4.8.3",
     "xml2js": "^0.6.2",
-    "yup": "^1.6.1"
-  },
-  "resolutions": {
-    "react-dev-utils": "10.1.0"
+    "yup": "^1.7.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "test": "jest",
-    "eject": "react-scripts eject"
+    "deploy": "gh-pages -d dist",
+    "test": "jest"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -82,27 +60,44 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/index.tsx"
+    ],
+    "coverageReporters": [
+      "text"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/assetsTransformer.ts",
+      "\\.(css|less|scss)$": "<rootDir>/assetsTransformer.ts"
+    }
+  },
   "devDependencies": {
-    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-env": "^7.29.2",
     "@testing-library/dom": "^10.4.1",
-    "@testing-library/react": "^16.3.0",
+    "@testing-library/react": "^16.3.2",
     "@types/jest": "^27.5.2",
-    "@types/jquery": "^3.5.33",
+    "@types/jquery": "^3.5.34",
     "@types/match-sorter": "^5.0.0",
-    "@types/node": "^18.19.39",
-    "@types/react": "^18.3.3",
-    "@types/react-big-calendar": "^1.8.8",
-    "@types/react-dom": "^18.3.0",
+    "@types/node": "^18.19.130",
+    "@types/react": "^19.2.14",
+    "@types/react-big-calendar": "^1.16.3",
+    "@types/react-dom": "^19.2.3",
     "@types/react-modal": "^3.16.3",
-    "@types/react-router-dom": "^5.3.3",
     "@types/react-table": "^7.7.20",
     "@types/react-test-renderer": "^19.1.0",
     "@types/xml2js": "^0.4.14",
+    "@vitejs/plugin-react": "^4.6.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
-    "babel-jest": "^30.0.4",
+    "babel-jest": "^30.3.0",
     "enzyme": "^3.11.0",
     "gh-pages": "^6.3.0",
-    "react-test-renderer": "^18.3.1",
-    "typescript": "^4.9.5"
+    "react-test-renderer": "^19.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.3.5"
   }
 }

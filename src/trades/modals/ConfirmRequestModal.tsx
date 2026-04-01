@@ -169,9 +169,9 @@ const ConfirmRequestModal: React.FC<ConfirmRequestModalProps> = ({
             <Label htmlFor="notes">Notes</Label>
             <Input
               type="textarea"
-              maxLength="500"
-              style={{ resize: "none", width: "400" }}
-              rows="5"
+              maxLength={500}
+              style={{ resize: "none" }}
+              rows={5}
               name="notes"
               id="tradeNotes"
               placeholder="500 characters max."
