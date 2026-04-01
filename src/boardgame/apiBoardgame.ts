@@ -1,6 +1,7 @@
 import { isAuthenticated } from "../auth";
+import { logger } from "../utils/logger";
 
-export const getBGCollection = (username, token) => {
+export const getBGCollection = (username: string, token: string) => {
   return fetch(`${import.meta.env.VITE_API_URL}/boardgame/${username}`, {
     method: "GET",
     headers: {
@@ -10,11 +11,13 @@ export const getBGCollection = (username, token) => {
     }
   })
     .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     })
-    .catch(err => console.log(err));
+    .catch(err => { logger.error("getBGCollection", err); });
 };
-export const getGuruCollection = (userId, token) => {
+
+export const getGuruCollection = (userId: string, token: string) => {
   return fetch(
     `${import.meta.env.VITE_API_URL}/boardgame/user/collection/${userId}`,
     {
@@ -27,12 +30,13 @@ export const getGuruCollection = (userId, token) => {
     }
   )
     .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     })
-
-    .catch(err => console.log(err));
+    .catch(err => { logger.error("getGuruCollection", err); });
 };
-export const getBGGCounts = (username, token) => {
+
+export const getBGGCounts = (username: string, token: string) => {
   return fetch(`${import.meta.env.VITE_API_URL}/boardgame/count/${username}`, {
     method: "GET",
     headers: {
@@ -42,13 +46,14 @@ export const getBGGCounts = (username, token) => {
     }
   })
     .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     })
-    .catch(err => console.log(err));
+    .catch(err => { logger.error("getBGGCounts", err); });
 };
 
-export const updateUserBoardgames = (userId, boardgameUpdate) => {
-  let token = isAuthenticated().token;
+export const updateUserBoardgames = (userId: string, boardgameUpdate: unknown) => {
+  const token = isAuthenticated() && (isAuthenticated() as any).token;
   return fetch(
     `${import.meta.env.VITE_API_URL}/boardgame/user/collection/${userId}/update`,
     {
@@ -63,19 +68,13 @@ export const updateUserBoardgames = (userId, boardgameUpdate) => {
   )
     .then(response => {
       if (response.status === 200) {
-        return response.json;
+        return response.json();
       }
     })
-    .then(data => {
-      return data;
-    })
-    .catch(err => console.log(err));
+    .catch(err => { logger.error("updateUserBoardgames", err); });
 };
 
-export const getAtlasBoardgameId = name => {
-  console.log(
-    `${import.meta.env.VITE_BOARDGAME_ATLAS_API_URL}/search?name=${name}&fields=id,name,price,msrp&client_id=${import.meta.env.VITE_BOARDGAME_ATLAS_CLIENT_ID}`
-  );
+export const getAtlasBoardgameId = (name: string) => {
   return fetch(
     `${import.meta.env.VITE_BOARDGAME_ATLAS_API_URL}/search?name=${name}&fields=id,name,price,msrp&client_id=${import.meta.env.VITE_BOARDGAME_ATLAS_CLIENT_ID}`,
     {
@@ -85,13 +84,14 @@ export const getAtlasBoardgameId = name => {
       }
     }
   )
-    .then(response => response.json())
-    .catch(err => {
-      console.log(err);
-    });
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch(err => { logger.error("getAtlasBoardgameId", err); });
 };
 
-export const getAtlasBoardgamePrice = game_id => {
+export const getAtlasBoardgamePrice = (game_id: string) => {
   return fetch(
     `${import.meta.env.VITE_BOARDGAME_ATLAS_API_URL}/game/prices?game_id=${game_id}&client_id=${import.meta.env.VITE_BOARDGAME_ATLAS_CLIENT_ID}`,
     {
@@ -101,8 +101,9 @@ export const getAtlasBoardgamePrice = game_id => {
       }
     }
   )
-    .then(response => response.json())
-    .catch(err => {
-      console.log(err);
-    });
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch(err => { logger.error("getAtlasBoardgamePrice", err); });
 };

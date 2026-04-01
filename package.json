@@ -13,7 +13,6 @@
     "@mui/lab": "^7.0.1-beta.23",
     "@mui/material": "^7.3.9",
     "@tanstack/react-table": "^8.21.3",
-    "axios": "^1.14.0",
     "bootstrap": "^5.3.8",
     "date-fns": "^4.1.0",
     "formik": "^2.4.9",
@@ -34,12 +33,12 @@
     "reactstrap": "^9.2.3",
     "sass": "^1.98.0",
     "socket.io-client": "^4.8.3",
-    "xml2js": "^0.6.2",
     "yup": "^1.7.1"
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
@@ -61,9 +60,6 @@
     ]
   },
   "jest": {
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ],
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/index.tsx"
@@ -81,7 +77,6 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^27.5.2",
-    "@types/jquery": "^3.5.34",
     "@types/match-sorter": "^5.0.0",
     "@types/node": "^18.19.130",
     "@types/react": "^19.2.14",
@@ -90,11 +85,8 @@
     "@types/react-modal": "^3.16.3",
     "@types/react-table": "^7.7.20",
     "@types/react-test-renderer": "^19.1.0",
-    "@types/xml2js": "^0.4.14",
     "@vitejs/plugin-react": "^4.6.0",
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-jest": "^30.3.0",
-    "enzyme": "^3.11.0",
     "gh-pages": "^6.3.0",
     "react-test-renderer": "^19.2.4",
     "typescript": "^5.9.3",

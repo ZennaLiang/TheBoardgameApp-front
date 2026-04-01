@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { logger } from "../utils/logger";
 
 const conditionBgRender = condition => {
   switch (condition) {
@@ -17,34 +18,41 @@ const conditionBgRender = condition => {
   }
 };
 
-const changeStore = (item, selected, listName) => {
-  const tradeData =
-    JSON.parse(sessionStorage.getItem(listName)) == null
-      ? []
-      : JSON.parse(sessionStorage.getItem(listName));
+const changeStore = (item, selected, listName, onSelectionChange?: (count: number) => void) => {
+  let tradeData: unknown[] = [];
+  const raw = sessionStorage.getItem(listName);
+  if (raw) {
+    try {
+      tradeData = JSON.parse(raw);
+    } catch {
+      tradeData = [];
+    }
+  }
   if (selected) {
     tradeData.push(item);
   } else {
-    tradeData.pop(item);
+    tradeData.pop();
   }
   sessionStorage.setItem(listName, JSON.stringify(tradeData));
-  toggleDisabledButton(tradeData);
+  onSelectionChange?.(tradeData.length);
 };
 
-const toggleDisabledButton = list => {
-  if (list.length > 0) {
-    document.getElementById("reviewTradeButton").classList.remove("disabled");
-  } else {
-    document.getElementById("reviewTradeButton").classList.add("disabled");
-  }
-};
+interface TradeCardProps {
+  bg: {
+    condition: string;
+    boardgame: { title: string };
+    tags: string[];
+  };
+  onSelectionChange?: (count: number) => void;
+  [key: string]: unknown;
+}
 
-const TradeCard = props => {
+const TradeCard: React.FC<TradeCardProps> = (props) => {
   const [selected, setSelected] = useState(false);
 
-  const handleClick = e => {
-    let listIdName = e.currentTarget.parentElement.id;
-    changeStore(props, !selected, listIdName);
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const listIdName = (e.currentTarget.parentElement as HTMLElement).id;
+    changeStore(props, !selected, listIdName, props.onSelectionChange);
     setSelected(!selected);
   };
   return (

@@ -10,9 +10,10 @@ interface TradeDeckProps {
   user?: string;
   bgData: any[];
   listID: string;
+  onSelectionChange?: (count: number) => void;
 }
 
-const TradeDeck: React.FC<TradeDeckProps> = ({ userId, user, bgData, listID }) => {
+const TradeDeck: React.FC<TradeDeckProps> = ({ userId, user, bgData, listID, onSelectionChange }) => {
   const [bgDataState, setBgDataState] = useState<any[]>([{}]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState<string | null>(null);
@@ -24,7 +25,6 @@ const TradeDeck: React.FC<TradeDeckProps> = ({ userId, user, bgData, listID }) =
         const id = await getUserId(userName);
         const bgList = await getGuruCollection(id, isAuthenticated().token);
         setBgDataState(bgList);
-        console.log(bgList);
         setIsLoading(false);
       } catch (err) {
         console.log(err);
@@ -72,8 +72,8 @@ const TradeDeck: React.FC<TradeDeckProps> = ({ userId, user, bgData, listID }) =
         id="searchList"
         onChange={searchSpace}
       />
-      {items.map((bg, i) => {
-        return <TradeCard id={bg._id} key={bg._id} bg={bg} />;
+      {items.map((bg) => {
+        return <TradeCard id={bg._id} key={bg._id} bg={bg} onSelectionChange={onSelectionChange} />;
       })}
 
       <div className="invalid-feedback">Please select a game to trade.</div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { isAuthenticated } from "../auth";
 import TradesSideBar from "./TradesSideBar";
 import TradeDeck from "./TradeDeck";
@@ -35,6 +35,7 @@ const TradeRequestContainer: React.FC = () => {
   const [price, setPrice] = useState(0);
   const [searchedUserPrice, setSearchedUserPrice] = useState(0);
   const [show, setShow] = useState(false);
+  const [selectedCount, setSelectedCount] = useState(0);
   const [tradeData, setTradeData] = useState<TradeData>({
     userID: "",
     userTradeList: [],
@@ -57,6 +58,8 @@ const TradeRequestContainer: React.FC = () => {
     notes: ""
   });
   
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const baseState = useRef({
     redirectToHome: false,
     foundUser: false,
@@ -84,61 +87,52 @@ const TradeRequestContainer: React.FC = () => {
     }
   };
 
-  const listsExists = () => {
-    console.log(sessionStorage.getItem("myList"));
-    if (
-      sessionStorage.getItem("myList") === null ||
-      sessionStorage.getItem("searchedUserList") === null
-    ) {
-      return false;
-    } else {
-      return true;
+  const parseSessionList = (key: string): unknown[] => {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
     }
   };
 
+  const listsExist = () =>
+    sessionStorage.getItem("myList") !== null &&
+    sessionStorage.getItem("searchedUserList") !== null;
+
   const showModal = () => {
-    if (listsExists()) {
-      console.log("tradeData ISNULL");
+    if (!listsExist()) {
       setTradeData(prevState => ({
         ...prevState,
         userTradeList: [],
         searchedUserTradeList: []
       }));
-    } else {
-      setShow(!show);
-      setTradeData(prevState => ({
-        ...prevState,
-        userTradeList: JSON.parse(sessionStorage.getItem("myList")),
-        searchedUserTradeList: JSON.parse(
-          sessionStorage.getItem("searchedUserList")
-        )
-      }));
+      setShow(s => !s);
+      return;
     }
-    setShow(!show);
+    setShow(s => !s);
     setTradeData(prevState => ({
       ...prevState,
-      userTradeList: JSON.parse(sessionStorage.getItem("myList")),
-      searchedUserTradeList: JSON.parse(
-        sessionStorage.getItem("searchedUserList")
-      )
+      userTradeList: parseSessionList("myList"),
+      searchedUserTradeList: parseSessionList("searchedUserList")
     }));
-    console.log(tradeData);
   };
 
   const loadSearchedUserBoardgameData = async (user: string) => {
-    //load logged in user's boardgames
     clear();
-    await loadUserBoardgameData(isAuthenticated().user.name);
+    const auth = isAuthenticated();
+    if (!auth) return;
+    await loadUserBoardgameData(auth.user.name);
     setTradeData(prevState => ({
       ...prevState,
-      userID: isAuthenticated().user._id
+      userID: auth.user._id
     }));
 
     try {
       const id = await getUserId(user);
-      if (!id || user === isAuthenticated().user.name) {
-        const searchbar = document.getElementById("searchbar");
-        searchbar?.classList.add("is-invalid");
+      if (!id || user === auth.user.name) {
+        searchInputRef.current?.classList.add("is-invalid");
       } else {
         const bgList = await getGuruCollection(id, isAuthenticated().token);
         try {
@@ -161,13 +155,11 @@ const TradeRequestContainer: React.FC = () => {
   };
 
   const onChangeSearchBar = () => {
-    const searchbar = document.getElementById("searchbar");
-    searchbar?.classList.remove("is-invalid");
+    searchInputRef.current?.classList.remove("is-invalid");
   };
 
   const handleSearchButton = () => {
-    const searchbar = document.getElementById("searchbar") as HTMLInputElement;
-    const inputValue = searchbar.value;
+    const inputValue = searchInputRef.current?.value ?? "";
     loadSearchedUserBoardgameData(inputValue);
     sessionStorage.removeItem("myList");
     sessionStorage.removeItem("searchedUserList");
@@ -176,11 +168,13 @@ const TradeRequestContainer: React.FC = () => {
   const handleEnterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const val = e.currentTarget.value;
     if (e.key === "Enter" && val.trim().length > 0) {
-      const searchbar = document.getElementById("searchbar") as HTMLInputElement;
-      const inputValue = searchbar.value;
-      loadSearchedUserBoardgameData(inputValue);
+      loadSearchedUserBoardgameData(val);
     }
   };
+
+  const handleSelectionChange = useCallback((count: number) => {
+    setSelectedCount(count);
+  }, []);
 
   //handles price change up till the decimal, extra validation toFixed(2) is used to round decimals to 2 digits.
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,6 +227,7 @@ const TradeRequestContainer: React.FC = () => {
               <FormGroup className="col-12">
                 <Input
                   id="searchbar"
+                  innerRef={searchInputRef}
                   onChange={onChangeSearchBar}
                   placeholder="Search..."
                   onKeyUp={handleEnterKey}
@@ -289,6 +284,7 @@ const TradeRequestContainer: React.FC = () => {
                         bgData={userBoardgames}
                         listID="myList"
                         userId={tradeData.userID}
+                        onSelectionChange={handleSelectionChange}
                       />
                     </div>
                   </div>
@@ -336,7 +332,8 @@ const TradeRequestContainer: React.FC = () => {
                 <div className="offset-5">
                   <button
                     id="reviewTradeButton"
-                    className="btn btn-success disabled"
+                    className={`btn btn-success${selectedCount === 0 ? " disabled" : ""}`}
+                    disabled={selectedCount === 0}
                     onClick={showModal}
                   >
                     Review Trade

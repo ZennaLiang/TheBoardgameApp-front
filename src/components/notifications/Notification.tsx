@@ -27,28 +27,26 @@ export default function Notification(props: any) {
     props.notificationsObj.then(result => {
       if (local === null) {
         setNotifications(result);
-        console.log(JSON.stringify(props.notificationsObj));
         localStorage.setItem("notifications", JSON.stringify(result));
         setHasNew(true);
         setIsLoading(false);
       } else {
-        let localNotifications = JSON.parse(local);
-        console.log(localNotifications);
-        console.log(result);
+        let localNotifications: NotificationItem[] = [];
+        try {
+          localNotifications = JSON.parse(local);
+        } catch {
+          localNotifications = [];
+        }
         if (localNotifications.length === result.length) {
-          console.log("the same");
           setHasNew(false);
           setNotifications(localNotifications);
           setIsLoading(false);
         } else {
-          console.log("not the same");
-
-          let diff = result.filter(
+          const diff = result.filter(
             ({ id: id1 }) =>
               !localNotifications.some(({ id: id2 }) => id2 === id1)
           );
 
-          console.log(diff);
           diff.forEach(item => {
             localNotifications.push(item);
           });
@@ -74,11 +72,19 @@ export default function Notification(props: any) {
     setAnchorEl(null);
   };
 
-  const handleClickCard = id => {
-    let localNotifications = JSON.parse(localStorage.getItem("notifications"));
-    let foundIdx = localNotifications.findIndex(element => element.id === id);
-    localNotifications[foundIdx].isRead = true;
-    localStorage.setItem("notifications", JSON.stringify(localNotifications));
+  const handleClickCard = (id: string) => {
+    const raw = localStorage.getItem("notifications");
+    if (!raw) return;
+    try {
+      const localNotifications: NotificationItem[] = JSON.parse(raw);
+      const foundIdx = localNotifications.findIndex(el => el.id === id);
+      if (foundIdx !== -1) {
+        localNotifications[foundIdx].isRead = true;
+        localStorage.setItem("notifications", JSON.stringify(localNotifications));
+      }
+    } catch {
+      // corrupted storage, ignore
+    }
   };
 
   const open = Boolean(anchorEl);

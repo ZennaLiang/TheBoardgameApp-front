@@ -1,80 +1,75 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# TheBoardgameApp — Frontend
 
-## Available Scripts
+A React 19 + TypeScript application for boardgame collection management, trading, and community.
 
-In the project directory, you can run:
+## Tech Stack
 
-### `npm start`
+- **Framework:** React 19, React Router 7
+- **Build tool:** Vite 6
+- **Language:** TypeScript 5 (strict mode)
+- **UI:** Material UI 7, Bootstrap 5, Reactstrap
+- **Forms:** Formik + Yup
+- **Real-time:** Socket.io-client
+- **Animations:** GSAP, in-view
+- **Calendar:** react-big-calendar
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Getting Started
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### Prerequisites
 
-### `npm test`
+- Node.js 18+ (or 20 LTS recommended)
+- pnpm (preferred) or npm
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Install dependencies
 
-### `npm run build`
+```bash
+pnpm install
+```
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Environment variables
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Copy `.env.example` to `.env` and fill in your values:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+cp .env.example .env
+```
 
-### `npm run eject`
+See `.env.example` for all required variables.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Run development server
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+pnpm run start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Runs on [http://localhost:5173](http://localhost:5173) by default.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Build for production
 
-## Learn More
+```bash
+pnpm run build
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Output goes to the `dist/` folder.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Type checking
 
-### Code Splitting
+```bash
+pnpm run type-check
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+### Run tests
 
-### Analyzing the Bundle Size
+```bash
+pnpm test
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+### Deploy to GitHub Pages
 
-### Making a Progressive Web App
+```bash
+pnpm run deploy
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+## MSRP Prices
 
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
-
-# TheBoardgameApp-front
-
-### MSRP Prices
-
-Prices are obtained from BoardgameAtlas API : https://www.boardgameatlas.com/api/docs
-
-### IMPORTANT
-
-Uses Node Version 16.18.0
-If node-sass wont install use this cmd:
-npm config set python "C:\Python27\python.exe"
+Prices are obtained from the [BoardGameAtlas API](https://www.boardgameatlas.com/api/docs).

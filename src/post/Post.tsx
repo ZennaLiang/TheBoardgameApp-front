@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { logger } from "../utils/logger";
 import { Link, Navigate, useParams } from "react-router-dom";
 
 import { getPost, removePost, likePost, unlikePost } from "./apiPost";
@@ -38,18 +39,20 @@ const Post: React.FC<PostProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (postId) {
-      getPost(postId).then(data => {
-        if (data.error) {
-          console.log(data.error);
-        } else {
-          setPost(data);
-          setLikes(data.likes.length);
-          setLike(isLiked(data.likes));
-          setComments(data.comments);
-        }
-      });
-    }
+    if (!postId) return;
+    const controller = new AbortController();
+    getPost(postId).then(data => {
+      if (controller.signal.aborted) return;
+      if (data?.error) {
+        logger.error("Post", data.error);
+      } else if (data) {
+        setPost(data);
+        setLikes(data.likes.length);
+        setLike(isLiked(data.likes));
+        setComments(data.comments);
+      }
+    });
+    return () => controller.abort();
   }, [postId, isLiked]);
 
 
@@ -67,7 +70,7 @@ const Post: React.FC<PostProps> = () => {
 
     callApi(userId, token, currentPostId).then(data => {
       if (data.error) {
-        console.log(data.error);
+        logger.error("Post", data.error);
       } else {
         setLike(!like); // toggle like state
         setLikes(data.likes.length);
@@ -80,7 +83,7 @@ const Post: React.FC<PostProps> = () => {
       const token = isAuthenticated().token;
       removePost(postId, token).then(data => {
         if (data.error) {
-          console.log(data.error);
+          logger.error("Post", data.error);
         } else {
           setRedirectToPosts(true);
         }

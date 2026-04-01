@@ -1,22 +1,23 @@
-function replacer(key, value) {
+import { logger } from "../utils/logger";
+
+function replacer(key: string, value: unknown) {
   if (key === "userTradeList" || key === "searchedUserTradeList") {
-    let list = [];
-    for (var i = 0; i < value.length; i++) {
-      let obj = {
-        name: value[i].bg.boardgame.title,
-        condition: value[i].bg.condition,
-        id: value[i].id,
-        tags: value[i].bg.tags
-      };
-      list.push(obj);
+    const list: unknown[] = [];
+    const arr = value as any[];
+    for (let i = 0; i < arr.length; i++) {
+      list.push({
+        name: arr[i].bg.boardgame.title,
+        condition: arr[i].bg.condition,
+        id: arr[i].id,
+        tags: arr[i].bg.tags
+      });
     }
     return list;
-  } else {
-    return value;
   }
+  return value;
 }
 
-export const createTrade = (token, trade) => {
+export const createTrade = (token: string, trade: unknown) => {
   return fetch(`${import.meta.env.VITE_API_URL}/trade/requestTrade`, {
     method: "POST",
     headers: {
@@ -24,16 +25,15 @@ export const createTrade = (token, trade) => {
     },
     body: JSON.stringify(trade, replacer)
   })
-    .then(response => response.json())
-    .then(data => {
-      return data.tradeId;
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
     })
-    .catch(err => {
-      console.log(err);
-    });
+    .then(data => data.tradeId)
+    .catch(err => { logger.error("createTrade", err); });
 };
 
-export const deleteTrade = (token, tradeId) => {
+export const deleteTrade = (token: string, tradeId: string) => {
   return fetch(`${import.meta.env.VITE_API_URL}/trade/delete/${tradeId}`, {
     method: "DELETE",
     headers: {
@@ -43,10 +43,10 @@ export const deleteTrade = (token, tradeId) => {
     }
   })
     .then(response => {
-      console.log(response);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     })
-    .catch(err => console.log(err));
+    .catch(err => { logger.error("deleteTrade", err); });
 };
 
 export const getAllTradeRequests = () => {
@@ -56,13 +56,14 @@ export const getAllTradeRequests = () => {
       "Content-Type": "application/json"
     }
   })
-    .then(response => response.json())
-    .catch(err => {
-      console.log(err);
-    });
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch(err => { logger.error("getAllTradeRequests", err); });
 };
 
-export const getAllTradeRequestsById = userId => {
+export const getAllTradeRequestsById = (userId: string) => {
   return fetch(`${import.meta.env.VITE_API_URL}/trades/by/${userId}`, {
     method: "GET",
     headers: {
@@ -70,31 +71,28 @@ export const getAllTradeRequestsById = userId => {
     }
   })
     .then(response => {
-      if (response.status === 204) {
-        return false;
-      } else {
-        return response.json();
-      }
+      if (response.status === 204) return false;
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
     })
-    .catch(err => {
-      console.log(err);
-    });
+    .catch(err => { logger.error("getAllTradeRequestsById", err); });
 };
 
-export const getTradeRequestById = tradeId => {
+export const getTradeRequestById = (tradeId: string) => {
   return fetch(`${import.meta.env.VITE_API_URL}/trade/by/${tradeId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
     }
   })
-    .then(response => response.json())
-    .catch(err => {
-      console.log(err);
-    });
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch(err => { logger.error("getTradeRequestById", err); });
 };
 
-export const updateTradeStatus = (token, tradeId, status) => {
+export const updateTradeStatus = (token: string, tradeId: string, status: string) => {
   return fetch(`${import.meta.env.VITE_API_URL}/trade/update/${tradeId}`, {
     method: "PUT",
     headers: {
@@ -102,11 +100,11 @@ export const updateTradeStatus = (token, tradeId, status) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ status: status })
+    body: JSON.stringify({ status })
   })
     .then(response => {
-      console.log(response);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     })
-    .catch(err => console.log(err));
+    .catch(err => { logger.error("updateTradeStatus", err); });
 };

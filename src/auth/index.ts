@@ -1,3 +1,5 @@
+import { logger } from "../utils/logger";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface SignupUser {
@@ -35,8 +37,11 @@ export const signup = (user: SignupUser): Promise<any> => {
     },
     body: JSON.stringify(user),
   })
-    .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch((err) => { logger.error("signup", err); });
 };
 
 export const signin = (user: SigninUser): Promise<AuthData> => {
@@ -49,7 +54,7 @@ export const signin = (user: SigninUser): Promise<AuthData> => {
     body: JSON.stringify(user),
   })
     .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .catch((err) => { logger.error("signin", err); });
 };
 
 export const googleLogin = (user: { tokenId: string }): Promise<AuthData> => {
@@ -61,8 +66,11 @@ export const googleLogin = (user: { tokenId: string }): Promise<AuthData> => {
     },
     body: JSON.stringify(user),
   })
-    .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch((err) => { logger.error("googleLogin", err); });
 };
 
 export const facebookLogin = (user: { email: string; name: string }): Promise<AuthData> => {
@@ -74,8 +82,11 @@ export const facebookLogin = (user: { email: string; name: string }): Promise<Au
     },
     body: JSON.stringify(user),
   })
-    .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch((err) => { logger.error("facebookLogin", err); });
 };
 
 export const authenticate = (jwt: AuthData, next: () => void): void => {
@@ -91,19 +102,25 @@ export const signout = (next: () => void): Promise<any> => {
   return fetch(`${API_URL}/signout`, {
     method: "GET",
   })
-    .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch((err) => { logger.error("signout", err); });
 };
 
-export const isAuthenticated = (): AuthData => {
+export const isAuthenticated = (): AuthData | false => {
   if (typeof window === "undefined") {
-    return false as unknown as AuthData;
+    return false;
   }
   const item = localStorage.getItem("jwt");
-  if (item) {
+  if (!item) return false;
+  try {
     return JSON.parse(item) as AuthData;
+  } catch {
+    localStorage.removeItem("jwt");
+    return false;
   }
-  return false as unknown as AuthData;
 };
 
 export const forgotPasswordReq = (email: string): Promise<any> => {
@@ -115,8 +132,11 @@ export const forgotPasswordReq = (email: string): Promise<any> => {
     },
     body: JSON.stringify({ email }),
   })
-    .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch((err) => { logger.error("forgotPasswordReq", err); });
 };
 
 export const resetPasswordReq = (resetInfo: {
@@ -131,6 +151,9 @@ export const resetPasswordReq = (resetInfo: {
     },
     body: JSON.stringify(resetInfo),
   })
-    .then((response) => response.json())
-    .catch((err) => console.log(err));
+    .then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch((err) => { logger.error("resetPasswordReq", err); });
 };

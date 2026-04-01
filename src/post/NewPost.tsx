@@ -21,7 +21,14 @@ const NewPost: React.FC = () => {
     setUser(isAuthenticated().user);
   }, []);
 
+  const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
   const isValid = () => {
+    if (photo && !ALLOWED_MIME_TYPES.includes((photo as unknown as File).type)) {
+      setError("Only JPEG, PNG, GIF and WebP images are allowed");
+      setLoading(false);
+      return false;
+    }
     if (fileSize > 100000) {
       setError("File size should be less than 100kb");
       setLoading(false);

@@ -48,42 +48,22 @@ const TradeSettings: React.FC<TradeSettingsProps> = ({ userId }) => {
     }
   }, [userId]);
 
-  const onClickCondition = (e: React.MouseEvent<HTMLButtonElement>, listID: string) => {
-    const group = document.querySelectorAll(
-      `.btn-group[data-id='${listID}'] button`
+  const onClickCondition = (listID: string, condition: string) => {
+    setUserBoardgames(prev =>
+      prev.map(bg => bg._id === listID ? { ...bg, condition } : bg)
     );
-
-    group.forEach((el) => {
-      console.log(el);
-      if (el.classList.contains("btn-primary")) {
-        el.classList.replace("btn-primary", "btn-outline-primary");
-      }
-    });
-
-    (e.target as HTMLButtonElement).classList.replace("btn-outline-primary", "btn-primary");
   };
 
   const onClickUpdate = () => {
-    const data = [...userBoardgames];
-    data.forEach((bg) => {
-      const primaryBtn = document.querySelector(
-        `.btn-group[data-id='${bg._id}'] .btn-primary`
-      ) as HTMLButtonElement;
-      bg.condition = primaryBtn.innerText;
-      bg.price = 5;
-    });
-
-    console.log("DATA");
-    console.log(data);
+    const data = userBoardgames.map(bg => ({ ...bg, price: 5 }));
     setUpdateStatus("saving");
-    
+
     if (userID) {
       updateUserBoardgames(userID, data)
-        .then((data) => {
+        .then(() => {
           setUpdateStatus("saved");
-          return data;
         })
-        .catch((error) => {
+        .catch(() => {
           setUpdateStatus("error");
         });
     }
@@ -164,52 +144,32 @@ const TradeSettings: React.FC<TradeSettingsProps> = ({ userId }) => {
 
                 <div className="d-flex justify-content-center align-items-center">
                   <span className="font-weight-normal">Condition: </span>
-                  <div className="btn-group mx-3" data-id={item._id}>
+                  <div className="btn-group mx-3">
                     <button
                       value="Excellent"
-                      onClick={(e) => {
-                        onClickCondition(e, item._id);
-                      }}
-                      className={`btn ${renderCondition(
-                        "Excellent",
-                        item.condition
-                      )} cursor-pointer`}
+                      onClick={() => onClickCondition(item._id, "Excellent")}
+                      className={`btn ${renderCondition("Excellent", item.condition)} cursor-pointer`}
                     >
                       Excellent
                     </button>
                     <button
                       value="Good"
-                      onClick={(e) => {
-                        onClickCondition(e, item._id);
-                      }}
-                      className={`btn ${renderCondition(
-                        "Good",
-                        item.condition
-                      )} cursor-pointer`}
+                      onClick={() => onClickCondition(item._id, "Good")}
+                      className={`btn ${renderCondition("Good", item.condition)} cursor-pointer`}
                     >
                       Good
                     </button>
                     <button
                       value="Fair"
-                      onClick={(e) => {
-                        onClickCondition(e, item._id);
-                      }}
-                      className={`btn ${renderCondition(
-                        "Fair",
-                        item.condition
-                      )} cursor-pointer`}
+                      onClick={() => onClickCondition(item._id, "Fair")}
+                      className={`btn ${renderCondition("Fair", item.condition)} cursor-pointer`}
                     >
                       Fair
                     </button>
                     <button
                       value="Poor"
-                      onClick={(e) => {
-                        onClickCondition(e, item._id);
-                      }}
-                      className={`btn ${renderCondition(
-                        "Poor",
-                        item.condition
-                      )} cursor-pointer`}
+                      onClick={() => onClickCondition(item._id, "Poor")}
+                      className={`btn ${renderCondition("Poor", item.condition)} cursor-pointer`}
                     >
                       Poor
                     </button>

@@ -1,4 +1,6 @@
-export const createPost = (userId, token, post) => {
+import { logger } from "../utils/logger";
+
+export const createPost = (userId: string, token: string, post: FormData) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/new/${userId}`, {
         method: "POST",
         headers: {
@@ -8,32 +10,35 @@ export const createPost = (userId, token, post) => {
         body: post
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("createPost", err); });
 };
 
-export const getPosts = page => {
+export const getPosts = (page: number) => {
     return fetch(`${import.meta.env.VITE_API_URL}/posts?page=${page}`, {
         method: "GET"
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("getPosts", err); });
 };
 
-export const getPost = postId => {
+export const getPost = (postId: string) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/${postId}`, {
         method: "GET"
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("getPost", err); });
 };
 
-export const getPostsByUserId = (userId, token) => {
+export const getPostsByUserId = (userId: string, token: string) => {
     return fetch(`${import.meta.env.VITE_API_URL}/posts/by/${userId}`, {
         method: "GET",
         headers: {
@@ -43,12 +48,13 @@ export const getPostsByUserId = (userId, token) => {
         }
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("getPostsByUserId", err); });
 };
 
-export const removePost = (postId, token) => {
+export const removePost = (postId: string, token: string) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/${postId}`, {
         method: "DELETE",
         headers: {
@@ -58,12 +64,13 @@ export const removePost = (postId, token) => {
         }
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("removePost", err); });
 };
 
-export const updatePost = (postId, token, post) => {
+export const updatePost = (postId: string, token: string, post: FormData) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/${postId}`, {
         method: "PUT",
         headers: {
@@ -73,12 +80,13 @@ export const updatePost = (postId, token, post) => {
         body: post
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("updatePost", err); });
 };
 
-export const likePost = (userId, token, postId) => {
+export const likePost = (userId: string, token: string, postId: string) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/like`, {
         method: "PUT",
         headers: {
@@ -89,12 +97,13 @@ export const likePost = (userId, token, postId) => {
         body: JSON.stringify({ userId, postId })
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("likePost", err); });
 };
 
-export const unlikePost = (userId, token, postId) => {
+export const unlikePost = (userId: string, token: string, postId: string) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/unlike`, {
         method: "PUT",
         headers: {
@@ -105,12 +114,13 @@ export const unlikePost = (userId, token, postId) => {
         body: JSON.stringify({ userId, postId })
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("unlikePost", err); });
 };
 
-export const commentPost = (userId, token, postId, comment) => {
+export const commentPost = (userId: string, token: string, postId: string, comment: unknown) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/comment`, {
         method: "PUT",
         headers: {
@@ -121,12 +131,13 @@ export const commentPost = (userId, token, postId, comment) => {
         body: JSON.stringify({ userId, postId, comment })
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("commentPost", err); });
 };
 
-export const uncommentPost = (userId, token, postId, comment) => {
+export const uncommentPost = (userId: string, token: string, postId: string, comment: unknown) => {
     return fetch(`${import.meta.env.VITE_API_URL}/post/uncomment`, {
         method: "PUT",
         headers: {
@@ -137,7 +148,8 @@ export const uncommentPost = (userId, token, postId, comment) => {
         body: JSON.stringify({ userId, postId, comment })
     })
         .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
         })
-        .catch(err => console.log(err));
+        .catch(err => { logger.error("uncommentPost", err); });
 };
